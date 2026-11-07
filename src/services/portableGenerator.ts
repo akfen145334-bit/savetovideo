@@ -444,60 +444,109 @@ export async function generatePortableWindowsZip(): Promise<Blob> {
   const zip = new JSZip();
   const htmlContent = getSingleFilePortableHtml();
 
-  // Launcher Batch Script for Windows (opens in standalone clean app mode)
+  // Launcher Batch Script for Windows (checks Edge, Chrome, or default browser)
   const batchLauncher = `@echo off
+setlocal
 title SaveToVideo (Portable)
 echo ========================================================
 echo   SaveToVideo Portable - Cok Kanalli Indirme Yoneticisi
 echo   Kurulum gerektirmez. USB bellekten calisir.
 echo ========================================================
 
-set CURRENT_DIR=%~dp0
-set TARGET_HTML=%CURRENT_DIR%App\\SaveToVideo-Portable.html
+set "CURRENT_DIR=%~dp0"
+set "TARGET_HTML=%CURRENT_DIR%SaveToVideo.html"
+if not exist "%TARGET_HTML%" set "TARGET_HTML=%CURRENT_DIR%App\\SaveToVideo-Portable.html"
 
-:: Try launching in Edge App Mode
-start msedge --app="%TARGET_HTML%" >nul 2>&1
-if %ERRORLEVEL% EQU 0 exit /b
+:: 1. Microsoft Edge App Mode
+if exist "%ProgramFiles(x86)%\\Microsoft\\Edge\\Application\\msedge.exe" (
+    start "" "%ProgramFiles(x86)%\\Microsoft\\Edge\\Application\\msedge.exe" --app="%TARGET_HTML%"
+    exit /b 0
+)
+if exist "%ProgramFiles%\\Microsoft\\Edge\\Application\\msedge.exe" (
+    start "" "%ProgramFiles%\\Microsoft\\Edge\\Application\\msedge.exe" --app="%TARGET_HTML%"
+    exit /b 0
+)
 
-:: Fallback to Chrome App Mode
-start chrome --app="%TARGET_HTML%" >nul 2>&1
-if %ERRORLEVEL% EQU 0 exit /b
+:: 2. Google Chrome App Mode
+if exist "%ProgramFiles%\\Google\\Chrome\\Application\\chrome.exe" (
+    start "" "%ProgramFiles%\\Google\\Chrome\\Application\\chrome.exe" --app="%TARGET_HTML%"
+    exit /b 0
+)
+if exist "%ProgramFiles(x86)%\\Google\\Chrome\\Application\\chrome.exe" (
+    start "" "%ProgramFiles(x86)%\\Google\\Chrome\\Application\\chrome.exe" --app="%TARGET_HTML%"
+    exit /b 0
+)
+if exist "%LocalAppData%\\Google\\Chrome\\Application\\chrome.exe" (
+    start "" "%LocalAppData%\\Google\\Chrome\\Application\\chrome.exe" --app="%TARGET_HTML%"
+    exit /b 0
+)
 
-:: Fallback to Default Browser
+:: 3. Varsayilan Tarayici
 start "" "%TARGET_HTML%"
-exit /b
+exit /b 0
+`;
+
+  // Silent VBScript Launcher (no black CMD prompt window)
+  const vbsLauncher = `' SaveToVideo Portable - Sessiz Baslatici
+Set oWS = CreateObject("WScript.Shell")
+Set fso = CreateObject("Scripting.FileSystemObject")
+currentDir = fso.GetParentFolderName(WScript.ScriptFullName)
+targetHtml = currentDir & "\\SaveToVideo.html"
+If Not fso.FileExists(targetHtml) Then targetHtml = currentDir & "\\App\\SaveToVideo-Portable.html"
+
+edge1 = oWS.ExpandEnvironmentStrings("%ProgramFiles(x86)%\\Microsoft\\Edge\\Application\\msedge.exe")
+edge2 = oWS.ExpandEnvironmentStrings("%ProgramFiles%\\Microsoft\\Edge\\Application\\msedge.exe")
+chrome1 = oWS.ExpandEnvironmentStrings("%ProgramFiles%\\Google\\Chrome\\Application\\chrome.exe")
+
+If fso.FileExists(edge1) Then
+    oWS.Run """" & edge1 & """ --app=""" & targetHtml & """", 1, False
+ElseIf fso.FileExists(edge2) Then
+    oWS.Run """" & edge2 & """ --app=""" & targetHtml & """", 1, False
+ElseIf fso.FileExists(chrome1) Then
+    oWS.Run """" & chrome1 & """ --app=""" & targetHtml & """", 1, False
+Else
+    oWS.Run """" & targetHtml & """", 1, False
+End If
 `;
 
   // Shell script for Mac / Linux
   const bashLauncher = `#!/bin/bash
 DIR="$( cd "$( dirname "\${BASH_SOURCE[0]}" )" && pwd )"
-if which xdg-open > /dev/null; then
-  xdg-open "$DIR/App/SaveToVideo-Portable.html"
-elif which open > /dev/null; then
-  open "$DIR/App/SaveToVideo-Portable.html"
+TARGET="$DIR/SaveToVideo.html"
+if [ ! -f "$TARGET" ]; then
+  TARGET="$DIR/App/SaveToVideo-Portable.html"
+fi
+
+if which xdg-open > /dev/null 2>&1; then
+  xdg-open "$TARGET"
+elif which open > /dev/null 2>&1; then
+  open "$TARGET"
 else
-  echo "Lutfen App/SaveToVideo-Portable.html dosyasini tarayicinizda acin."
+  echo "Lutfen SaveToVideo.html dosyasini tarayicinizda acin: $TARGET"
 fi
 `;
 
   const readme = `========================================================================
-  SaveToVideo - TASINABILIR / PORTATIF SURUM
+  SaveToVideo - TASINABILIR / PORTATIF SURUM (USB BELLEK UYUMLU)
 ========================================================================
 
 Bu surum tamamen bagimsiz ve tasinabilirdir (Portable).
 Bilgisayariniza herhangi bir kurulum veya yonetici yetkisi gerektirmez.
 
 Kullanim:
-1. "Baslat-SaveToVideo-Portable.bat" dosyasina cift tiklayin.
-2. SaveToVideo dogrudan bagimsiz masaustu penceresi olarak acilir.
-3. Tum ayarlar ve indirme kayitlari dosyanin icinde yerel olarak saklanir.
-4. Bu klasoru istediginiz USB bellege kopyalayip her bilgisayarda calistirabilirsiniz!
+1. Windows: "Baslat-SaveToVideo-Portable.bat" veya "Baslat-Sessiz.vbs" dosyasina cift tiklayin.
+2. Mac / Linux: "Baslat-SaveToVideo-Mac-Linux.sh" dosyasini calistirin veya dogrudan "SaveToVideo.html" dosyasini tarayicinizda acin.
+3. SaveToVideo dogrudan bagimsiz masaustu penceresi olarak acilir.
+4. Tum ayarlar ve indirme kayitlari yerel olarak saklanir.
+5. Bu klasoru istediginiz USB bellege kopyalayip her bilgisayarda calistirabilirsiniz!
 `;
 
   zip.file('Baslat-SaveToVideo-Portable.bat', batchLauncher);
+  zip.file('Baslat-Sessiz.vbs', vbsLauncher);
   zip.file('Baslat-SaveToVideo-Mac-Linux.sh', bashLauncher);
-  zip.file('README-PORTABLE.txt', readme);
+  zip.file('SaveToVideo.html', htmlContent);
   zip.file('App/SaveToVideo-Portable.html', htmlContent);
+  zip.file('README-PORTABLE.txt', readme);
 
   return await zip.generateAsync({ type: 'blob' });
 }
@@ -515,64 +564,311 @@ export function downloadPortableWindowsZip(): void {
   });
 }
 
-// 3. Download Desktop Installer Package
+// 3. Download Desktop Installer Package (100% Reliable Windows Setup)
 export async function generateDesktopInstallerZip(): Promise<Blob> {
   const zip = new JSZip();
   const htmlContent = getSingleFilePortableHtml();
 
+  // Bulletproof Batch Installer with comprehensive path discovery & fallback
   const installBat = `@echo off
-title SaveToVideo - Masaustu Kurulumu
+setlocal enabledelayedexpansion
+title SaveToVideo - Windows Masaustu Kurulumu
 color 0b
-echo ========================================================
-echo   SaveToVideo Kurulum Sihirbazi
-echo ========================================================
+
+echo ======================================================================
+echo           SaveToVideo - Cok Kanalli Video Indirme Yoneticisi
+echo                      Windows Kurulum Sihirbazi
+echo ======================================================================
 echo.
 
-set INSTALL_DIR=%LocalAppData%\\SaveToVideo
-echo [1/3] Kurulum dizini olusturuluyor: %INSTALL_DIR%
-if not exist "%INSTALL_DIR%" mkdir "%INSTALL_DIR%"
+:: 1. Kurulum hedef klasoru
+set "INSTALL_DIR=%LocalAppData%\\SaveToVideo"
+echo [1/4] Kurulum dizini hazirlaniyor: %INSTALL_DIR%
+if not exist "%INSTALL_DIR%" mkdir "%INSTALL_DIR%" >nul 2>&1
 
-echo [2/3] SaveToVideo dosyalari kopyalaniyor...
-copy /Y "%~dp0App\\SaveToVideo-Portable.html" "%INSTALL_DIR%\\SaveToVideo.html" >nul
+:: 2. Kaynak HTML dosyasini bul ve kopyala
+echo [2/4] SaveToVideo program dosyalari kopyalaniyor...
+set "SOURCE="
+if exist "%~dp0SaveToVideo.html" set "SOURCE=%~dp0SaveToVideo.html"
+if not defined SOURCE if exist "%~dp0App\\SaveToVideo-Portable.html" set "SOURCE=%~dp0App\\SaveToVideo-Portable.html"
+if not defined SOURCE if exist "%~dp0SaveToVideo-Portable.html" set "SOURCE=%~dp0SaveToVideo-Portable.html"
 
-echo [3/3] Windows Masaustu Kisayolu Olusturuluyor...
-set SCRIPT="%TEMP%\\%RANDOM%-%RANDOM%_create_shortcut.vbs"
-echo Set oWS = WScript.CreateObject("WScript.Shell") >> %SCRIPT%
-echo sLinkFile = oWS.ExpandEnvironmentStrings("%%USERPROFILE%%\\Desktop\\SaveToVideo.lnk") >> %SCRIPT%
-echo Set oLink = oWS.CreateShortcut(sLinkFile) >> %SCRIPT%
-echo oLink.TargetPath = "msedge.exe" >> %SCRIPT%
-echo oLink.Arguments = "--app=""" ^& "%INSTALL_DIR%\\SaveToVideo.html" ^& """" >> %SCRIPT%
-echo oLink.Description = "SaveToVideo Web Suite" >> %SCRIPT%
-echo oLink.Save >> %SCRIPT%
-cscript /nologo %SCRIPT%
-del %SCRIPT%
+if not defined SOURCE (
+    echo.
+    echo ======================================================================
+    echo [DIKKAT] Kurulum dosyalari bulunamadi!
+    echo.
+    echo Eger ZIP dosyasini acmadan dogrudan calistirdiysaniz, lutfen:
+    echo 1. Indirdiginiz ZIP dosyasina sag tiklayip "Tumunu Ayikla" (Extract All) deyin.
+    echo 2. Cikan klasordeki "Kurulum-SaveToVideo.bat" veya "Kurulum-SaveToVideo.vbs"
+    echo    dosyasini calistirin.
+    echo ======================================================================
+    echo.
+    pause
+    exit /b 1
+)
 
+copy /Y "%SOURCE%" "%INSTALL_DIR%\\SaveToVideo.html" >nul 2>&1
+
+if not exist "%INSTALL_DIR%\\SaveToVideo.html" (
+    echo [HATA] Program dosyalari kopyalanamadi. Lutfen Yonetici olarak calistirmayi deneyin.
+    pause
+    exit /b 1
+)
+
+:: 3. Baslatici Scriptleri Olustur (%INSTALL_DIR% icinde)
+set "LAUNCHER_VBS=%INSTALL_DIR%\\SaveToVideo.vbs"
+(
+echo Set oWS = CreateObject^("WScript.Shell"^)
+echo Set fso = CreateObject^("Scripting.FileSystemObject"^)
+echo htmlPath = oWS.ExpandEnvironmentStrings^("%INSTALL_DIR%\\SaveToVideo.html"^)
+echo edge1 = oWS.ExpandEnvironmentStrings^("%ProgramFiles(x86)%\\Microsoft\\Edge\\Application\\msedge.exe"^)
+echo edge2 = oWS.ExpandEnvironmentStrings^("%ProgramFiles%\\Microsoft\\Edge\\Application\\msedge.exe"^)
+echo chrome1 = oWS.ExpandEnvironmentStrings^("%ProgramFiles%\\Google\\Chrome\\Application\\chrome.exe"^)
+echo chrome2 = oWS.ExpandEnvironmentStrings^("%ProgramFiles(x86)%\\Google\\Chrome\\Application\\chrome.exe"^)
+echo chrome3 = oWS.ExpandEnvironmentStrings^("%LocalAppData%\\Google\\Chrome\\Application\\chrome.exe"^)
+echo If fso.FileExists^(edge1^) Then
+echo     oWS.Run """" ^& edge1 ^& """ --app=""" ^& htmlPath ^& """", 1, False
+echo ElseIf fso.FileExists^(edge2^) Then
+echo     oWS.Run """" ^& edge2 ^& """ --app=""" ^& htmlPath ^& """", 1, False
+echo ElseIf fso.FileExists^(chrome1^) Then
+echo     oWS.Run """" ^& chrome1 ^& """ --app=""" ^& htmlPath ^& """", 1, False
+echo ElseIf fso.FileExists^(chrome2^) Then
+echo     oWS.Run """" ^& chrome2 ^& """ --app=""" ^& htmlPath ^& """", 1, False
+echo ElseIf fso.FileExists^(chrome3^) Then
+echo     oWS.Run """" ^& chrome3 ^& """ --app=""" ^& htmlPath ^& """", 1, False
+echo Else
+echo     oWS.Run """" ^& htmlPath ^& """", 1, False
+echo End If
+) > "%LAUNCHER_VBS%"
+
+:: Ayrica .BAT baslatici da olustur
+(
+echo @echo off
+echo if exist "%ProgramFiles(x86)%\\Microsoft\\Edge\\Application\\msedge.exe" (
+echo     start "" "%ProgramFiles(x86)%\\Microsoft\\Edge\\Application\\msedge.exe" --app="%INSTALL_DIR%\\SaveToVideo.html"
+echo     exit /b
+echo ^)
+echo if exist "%ProgramFiles%\\Microsoft\\Edge\\Application\\msedge.exe" (
+echo     start "" "%ProgramFiles%\\Microsoft\\Edge\\Application\\msedge.exe" --app="%INSTALL_DIR%\\SaveToVideo.html"
+echo     exit /b
+echo ^)
+echo if exist "%ProgramFiles%\\Google\\Chrome\\Application\\chrome.exe" (
+echo     start "" "%ProgramFiles%\\Google\\Chrome\\Application\\chrome.exe" --app="%INSTALL_DIR%\\SaveToVideo.html"
+echo     exit /b
+echo ^)
+echo start "" "%INSTALL_DIR%\\SaveToVideo.html"
+echo exit /b
+) > "%INSTALL_DIR%\\SaveToVideo.bat"
+
+:: 4. Masaustu ve Baslat Menusu Kisayollari (PowerShell + VBScript cift guvence)
+echo [3/4] Masaustu ve Baslat Menusu kisayollari olusturuluyor...
+
+powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+  "$ws = New-Object -ComObject WScript.Shell; " ^
+  "$desk = [Environment]::GetFolderPath('Desktop'); " ^
+  "$progs = [Environment]::GetFolderPath('Programs'); " ^
+  "$target = '%INSTALL_DIR%\\SaveToVideo.vbs'; " ^
+  "if ($desk -and (Test-Path $desk)) { " ^
+  "  $s = $ws.CreateShortcut(\"$desk\\SaveToVideo.lnk\"); " ^
+  "  $s.TargetPath = 'wscript.exe'; " ^
+  "  $s.Arguments = \"\"\"$target\"\"\"; " ^
+  "  $s.WorkingDirectory = '%INSTALL_DIR%'; " ^
+  "  $s.Description = 'SaveToVideo Cok Kanalli Video Indirici'; " ^
+  "  $s.Save(); " ^
+  "}; " ^
+  "if ($progs -and (Test-Path $progs)) { " ^
+  "  $s2 = $ws.CreateShortcut(\"$progs\\SaveToVideo.lnk\"); " ^
+  "  $s2.TargetPath = 'wscript.exe'; " ^
+  "  $s2.Arguments = \"\"\"$target\"\"\"; " ^
+  "  $s2.WorkingDirectory = '%INSTALL_DIR%'; " ^
+  "  $s2.Description = 'SaveToVideo Cok Kanalli Video Indirici'; " ^
+  "  $s2.Save(); " ^
+  "}" >nul 2>&1
+
+:: Fallback VBScript ile de garanti altina al
+set "FALLBACK_VBS=%TEMP%\\create_stv_lnk_%RANDOM%.vbs"
+(
+echo Set oWS = CreateObject^("WScript.Shell"^)
+echo strDesktop = oWS.SpecialFolders^("Desktop"^)
+echo Set oLink = oWS.CreateShortcut^(strDesktop ^& "\\SaveToVideo.lnk"^)
+echo oLink.TargetPath = "wscript.exe"
+echo oLink.Arguments = """" ^& "%INSTALL_DIR%\\SaveToVideo.vbs" ^& """"
+echo oLink.WorkingDirectory = "%INSTALL_DIR%"
+echo oLink.Description = "SaveToVideo Cok Kanalli Video Indirici"
+echo oLink.Save
+) > "%FALLBACK_VBS%"
+cscript //nologo "%FALLBACK_VBS%" >nul 2>&1
+del "%FALLBACK_VBS%" >nul 2>&1
+
+echo [4/4] Kurulum basariyla tamamlandi!
 echo.
-echo ========================================================
-echo   KURULUM TAMAMLANDI!
-echo   Masaustunuzdeki "SaveToVideo" simgesine tiklayarak
-echo   SaveToVideo'yu bagimsiz masaustu uygulamasi olarak baslatabilirsiniz.
-echo ========================================================
+echo ======================================================================
+echo                      KURULUM TAMAMLANDI!
 echo.
-pause
+echo   SaveToVideo basariyla kuruldu!
+echo   * Masaustunuzdeki "SaveToVideo" simgesine tiklayarak baslatabilirsiniz.
+echo   * Baslat menusunden "SaveToVideo" yazarak arayabilirsiniz.
+echo ======================================================================
+echo.
+set /p RUNNOW="SaveToVideo simdi calistirilsin mi? (E/H) [Varsayilan: E]: "
+if /i "%RUNNOW%"=="h" goto finish
+start "" wscript.exe "%INSTALL_DIR%\\SaveToVideo.vbs"
+:finish
+echo.
+echo Tesekkurler!
+timeout /t 3 >nul 2>&1
+exit /b 0
 `;
 
+  // Visual VBScript installer (Double-click 1-second graphical installer with popups)
+  const installVbs = `' SaveToVideo Windows Gorsel Kurulum Sihirbazi
+Option Explicit
+Dim oWS, fso, strInstallDir, strSourceFile, currentDir, targetVbs, vbsFile, strDesktop, strPrograms, oLink, res
+
+Set oWS = CreateObject("WScript.Shell")
+Set fso = CreateObject("Scripting.FileSystemObject")
+
+strInstallDir = oWS.ExpandEnvironmentStrings("%LocalAppData%\\SaveToVideo")
+
+If Not fso.FolderExists(strInstallDir) Then
+    fso.CreateFolder(strInstallDir)
+End If
+
+currentDir = fso.GetParentFolderName(WScript.ScriptFullName)
+strSourceFile = ""
+
+If fso.FileExists(currentDir & "\\SaveToVideo.html") Then
+    strSourceFile = currentDir & "\\SaveToVideo.html"
+ElseIf fso.FileExists(currentDir & "\\App\\SaveToVideo-Portable.html") Then
+    strSourceFile = currentDir & "\\App\\SaveToVideo-Portable.html"
+ElseIf fso.FileExists(currentDir & "\\SaveToVideo-Portable.html") Then
+    strSourceFile = currentDir & "\\SaveToVideo-Portable.html"
+End If
+
+If strSourceFile = "" Then
+    MsgBox "Kurulum dosyalari bulunamadi!" & vbCrLf & vbCrLf & _
+           "Lutfen ZIP dosyasina sag tiklayip 'Tumunu Ayikla' dedikten sonra" & vbCrLf & _
+           "ayiklanan klasordeki 'Kurulum-SaveToVideo.vbs' veya 'Kurulum-SaveToVideo.bat' dosyasini calistirin.", _
+           vbExclamation, "SaveToVideo Kurulum"
+    WScript.Quit
+End If
+
+fso.CopyFile strSourceFile, strInstallDir & "\\SaveToVideo.html", True
+
+targetVbs = strInstallDir & "\\SaveToVideo.vbs"
+Set vbsFile = fso.CreateTextFile(targetVbs, True)
+vbsFile.WriteLine "Set oWS = CreateObject(""WScript.Shell"")"
+vbsFile.WriteLine "Set fso = CreateObject(""Scripting.FileSystemObject"")"
+vbsFile.WriteLine "htmlPath = oWS.ExpandEnvironmentStrings(""" & strInstallDir & "\\SaveToVideo.html"")"
+vbsFile.WriteLine "edge1 = oWS.ExpandEnvironmentStrings(""%ProgramFiles(x86)%\\Microsoft\\Edge\\Application\\msedge.exe"")"
+vbsFile.WriteLine "edge2 = oWS.ExpandEnvironmentStrings(""%ProgramFiles%\\Microsoft\\Edge\\Application\\msedge.exe"")"
+vbsFile.WriteLine "chrome1 = oWS.ExpandEnvironmentStrings(""%ProgramFiles%\\Google\\Chrome\\Application\\chrome.exe"")"
+vbsFile.WriteLine "If fso.FileExists(edge1) Then"
+vbsFile.WriteLine "    oWS.Run """" & edge1 & """ --app=""" & htmlPath & """", 1, False"
+vbsFile.WriteLine "ElseIf fso.FileExists(edge2) Then"
+vbsFile.WriteLine "    oWS.Run """" & edge2 & """ --app=""" & htmlPath & """", 1, False"
+vbsFile.WriteLine "ElseIf fso.FileExists(chrome1) Then"
+vbsFile.WriteLine "    oWS.Run """" & chrome1 & """ --app=""" & htmlPath & """", 1, False"
+vbsFile.WriteLine "Else"
+vbsFile.WriteLine "    oWS.Run """" & htmlPath & """", 1, False"
+vbsFile.WriteLine "End If"
+vbsFile.Close
+
+' Masaustu Kisayolu
+strDesktop = oWS.SpecialFolders("Desktop")
+Set oLink = oWS.CreateShortcut(strDesktop & "\\SaveToVideo.lnk")
+oLink.TargetPath = "wscript.exe"
+oLink.Arguments = """" & targetVbs & """"
+oLink.WorkingDirectory = strInstallDir
+oLink.Description = "SaveToVideo Cok Kanalli Video Indirici"
+oLink.Save
+
+' Baslat Menusu Kisayolu
+strPrograms = oWS.SpecialFolders("Programs")
+If fso.FolderExists(strPrograms) Then
+    Set oLink = oWS.CreateShortcut(strPrograms & "\\SaveToVideo.lnk")
+    oLink.TargetPath = "wscript.exe"
+    oLink.Arguments = """" & targetVbs & """"
+    oLink.WorkingDirectory = strInstallDir
+    oLink.Description = "SaveToVideo Cok Kanalli Video Indirici"
+    oLink.Save
+End If
+
+res = MsgBox("SaveToVideo basariyla masaustunuze kuruldu!" & vbCrLf & vbCrLf & _
+             "Masaustunuzdeki 'SaveToVideo' simgesine cift tiklayarak baslatabilirsiniz." & vbCrLf & vbCrLf & _
+             "Simdi SaveToVideo'yu acmak ister misiniz?", vbQuestion + vbYesNo, "SaveToVideo Kurulum Tamamlandi")
+
+If res = vbYes Then
+    oWS.Run "wscript.exe """ & targetVbs & """", 1, False
+End If
+`;
+
+  // Instant direct runner without installing (for quick testing)
+  const quickRunBat = `@echo off
+set "TARGET=%~dp0SaveToVideo.html"
+if not exist "%TARGET%" set "TARGET=%~dp0App\\SaveToVideo-Portable.html"
+start "" "%TARGET%"
+exit /b 0
+`;
+
+  // Clean uninstaller script
   const uninstallBat = `@echo off
 title SaveToVideo - Kaldirma Sihirbazi
 color 0c
 echo ========================================================
-echo   SaveToVideo Kaldiriliyor...
+echo   SaveToVideo Sistemden Kaldiriliyor...
 echo ========================================================
+
+powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+  "$ws = New-Object -ComObject WScript.Shell; " ^
+  "$desk = [Environment]::GetFolderPath('Desktop'); " ^
+  "$progs = [Environment]::GetFolderPath('Programs'); " ^
+  "Remove-Item \"$desk\\SaveToVideo.lnk\" -ErrorAction SilentlyContinue; " ^
+  "Remove-Item \"$progs\\SaveToVideo.lnk\" -ErrorAction SilentlyContinue;" >nul 2>&1
+
 del "%UserProfile%\\Desktop\\SaveToVideo.lnk" >nul 2>&1
 rd /s /q "%LocalAppData%\\SaveToVideo" >nul 2>&1
-echo SaveToVideo basariyla sisteminizden kaldirildi.
+
+echo.
+echo SaveToVideo basariyla sisteminizden ve masaustunuzden kaldirildi.
 pause
 `;
 
+  const guideTxt = `================================================================================
+SaveToVideo - Masaustu Kurulum ve Calistirma Rehberi
+================================================================================
+
+NASIL KURULUR? (Cok Basit - 2 Adim):
+
+1. ADIM: ZIP ARSIVINI CIKARIN:
+   Indirdiginiz bu ZIP dosyasina sag tiklayin ve "Tumunu Ayikla" (Extract All)
+   secenegini secip klasore cikarin.
+   (Onemli: Kurulum dosyalarinin birbirini gormesi icin ZIP'ten cikarilmalidir)
+
+2. ADIM: KURULUM DOSYASINA CIFT TIKLAYIN:
+   Klasordeki "Kurulum-SaveToVideo.bat" VEYA "Kurulum-SaveToVideo.vbs" dosyasina
+   cift tiklayin.
+   * Kurulum aninda tamamlanir.
+   * Masaustunuze ve Baslat Menunuze "SaveToVideo" simgesi eklenir!
+
+KURULUMSUZ KULLANMAK ICIN:
+   Hic kurulum yapmadan dogrudan kullanmak isterseniz "SaveToVideo.html" veya
+   "Hizli-Baslat.bat" dosyasina cift tiklamaniz yeterlidir.
+
+PROGRAMI KALDIRMAK ICIN:
+   Dilediginiz zaman "Kaldir-SaveToVideo.bat" dosyasina tiklayarak SaveToVideo'yu
+   ve masaustu kisayolunu tek tikla temizce kaldirabilirsiniz.
+================================================================================
+`;
+
   zip.file('Kurulum-SaveToVideo.bat', installBat);
-  zip.file('Kaldir-SaveToVideo.bat', uninstallBat);
+  zip.file('Kurulum-SaveToVideo.vbs', installVbs);
+  zip.file('Hizli-Baslat.bat', quickRunBat);
+  zip.file('SaveToVideo.html', htmlContent);
   zip.file('App/SaveToVideo-Portable.html', htmlContent);
-  zip.file('KILAVUZ.txt', 'Kurulum icin "Kurulum-SaveToVideo.bat" dosyasina cift tiklamaniz yeterlidir.');
+  zip.file('Kaldir-SaveToVideo.bat', uninstallBat);
+  zip.file('KILAVUZ-KURULUM.txt', guideTxt);
 
   return await zip.generateAsync({ type: 'blob' });
 }

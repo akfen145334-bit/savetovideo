@@ -181,33 +181,52 @@ export const PortabilityHubView: React.FC = () => {
               </span>
             </div>
             <p className="text-neutral-500 dark:text-neutral-400 text-[11px] leading-relaxed">
-              Geleneksel Windows programları gibi çift tıklamayla masaüstünüze SaveToVideo kısayolunu oluşturur ve bağımsız pencere modunda çalıştırır. İstenildiğinde tek tıkla kaldırılabilir.
+              Geleneksel Windows programları gibi çift tıklamayla masaüstünüze ve Başlat menünüze SaveToVideo kısayolunu oluşturur ve bağımsız pencere modunda çalıştırır.
             </p>
 
-            <ul className="space-y-1.5 text-[11px] text-neutral-600 dark:text-neutral-300 pt-1">
+            {/* Practical Quick Installation Steps */}
+            <div className="p-2.5 rounded-lg bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/60 dark:border-indigo-900/60 text-[11px] space-y-1 text-indigo-950 dark:text-indigo-200">
+              <div className="font-bold flex items-center gap-1.5 text-indigo-700 dark:text-indigo-300">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Kolay Kurulum (2 Adım):</span>
+              </div>
+              <p className="leading-snug text-neutral-600 dark:text-neutral-300">
+                <strong>1.</strong> ZIP'e sağ tıklayıp <em>"Tümünü Ayıkla"</em> deyin.
+              </p>
+              <p className="leading-snug text-neutral-600 dark:text-neutral-300">
+                <strong>2.</strong> Çıkan klasördeki <strong>Kurulum-SaveToVideo.vbs</strong> veya <strong>.bat</strong> dosyasına çift tıklayın. Masaüstünüze anında eklenir!
+              </p>
+            </div>
+
+            <ul className="space-y-1.5 text-[11px] text-neutral-600 dark:text-neutral-300 pt-0.5">
               <li className="flex items-center gap-1.5">
                 <Check className="w-3.5 h-3.5 text-emerald-500" />
-                <span>Masaüstü .lnk Kısayolu Oluşturucu</span>
+                <span>Görsel VBScript &amp; Batch Kurulum Sihirbazı</span>
+              </li>
+              <li className="flex items-center gap-1.5">
+                <Check className="w-3.5 h-3.5 text-emerald-500" />
+                <span>Masaüstü &amp; Başlat Menüsü .lnk Kısayolu</span>
               </li>
               <li className="flex items-center gap-1.5">
                 <Check className="w-3.5 h-3.5 text-emerald-500" />
                 <span>Tek Tıkla Temiz Kaldırma (.bat)</span>
               </li>
-              <li className="flex items-center gap-1.5">
-                <Check className="w-3.5 h-3.5 text-emerald-500" />
-                <span>Edge / Chrome App Moduyla Açılış</span>
-              </li>
             </ul>
           </div>
 
-          <button
-            onClick={() => handleDownload('desktop-installer', downloadDesktopInstallerZip)}
-            disabled={downloadingType === 'desktop-installer'}
-            className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition-colors shadow-2xs flex items-center justify-center gap-2"
-          >
-            <Download className="w-4 h-4" />
-            <span>{downloadingType === 'desktop-installer' ? 'Paketleniyor...' : 'Windows Kurulumunu İndir (.ZIP)'}</span>
-          </button>
+          <div className="space-y-2">
+            <button
+              onClick={() => handleDownload('desktop-installer', downloadDesktopInstallerZip)}
+              disabled={downloadingType === 'desktop-installer'}
+              className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition-colors shadow-2xs flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <Download className="w-4 h-4" />
+              <span>{downloadingType === 'desktop-installer' ? 'Paketleniyor...' : 'Windows Kurulumunu İndir (.ZIP)'}</span>
+            </button>
+            <p className="text-[10px] text-center text-neutral-400">
+              Paket içinde görsel sihirbaz, batch scripti ve kılavuz yer alır.
+            </p>
+          </div>
         </div>
       </div>
 
