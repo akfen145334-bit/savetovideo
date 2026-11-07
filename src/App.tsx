@@ -32,6 +32,8 @@ import { EmbeddedChromeBrowser } from './components/EmbeddedChromeBrowser';
 import { ChromeExtensionView } from './components/ChromeExtensionView';
 import { AddUrlModal } from './components/AddUrlModal';
 import { VideoPreviewModal } from './components/VideoPreviewModal';
+import { VideoPlayerModal } from './components/VideoPlayerModal';
+import { FolderExplorerModal } from './components/FolderExplorerModal';
 import { PortabilityHubView } from './components/PortabilityHubView';
 import { OfflineIndicator } from './components/PWAInstallButton';
 import { useOnlineStatus } from './hooks/usePWAInstall';
@@ -62,9 +64,12 @@ export default function App() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Modals state
+  // Address selector & Modals state
+  const [selectedAddressFilter, setSelectedAddressFilter] = useState<string>('all');
   const [segmentModalItem, setSegmentModalItem] = useState<DownloadItem | null>(null);
   const [previewItem, setPreviewItem] = useState<DownloadItem | null>(null);
+  const [watchNowItem, setWatchNowItem] = useState<DownloadItem | null>(null);
+  const [folderItem, setFolderItem] = useState<DownloadItem | null>(null);
   const [activeSniffResult, setActiveSniffResult] = useState<SniffResult | null>(null);
   const [pendingDownloadStream, setPendingDownloadStream] = useState<DetectedStream | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -85,12 +90,24 @@ export default function App() {
     saveStoredSettings(settings);
   }, [settings]);
 
-  // Keep segmentModalItem synced with real-time download progress
+  // Keep segmentModalItem, watchNowItem and folderItem synced with real-time download progress
   useEffect(() => {
     if (segmentModalItem) {
       const updated = downloads.find(d => d.id === segmentModalItem.id);
       if (updated) {
         setSegmentModalItem(updated);
+      }
+    }
+    if (watchNowItem) {
+      const updated = downloads.find(d => d.id === watchNowItem.id);
+      if (updated) {
+        setWatchNowItem(updated);
+      }
+    }
+    if (folderItem) {
+      const updated = downloads.find(d => d.id === folderItem.id);
+      if (updated) {
+        setFolderItem(updated);
       }
     }
   }, [downloads]);
@@ -603,7 +620,8 @@ export default function App() {
               onSelectAll={handleSelectAll}
               onClearSelection={handleClearSelection}
               onOpenSegmentDialog={(item) => setSegmentModalItem(item)}
-              onOpenPreview={(item) => setPreviewItem(item)}
+              onWatchNow={(item) => setWatchNowItem(item)}
+              onShowInFolder={(item) => setFolderItem(item)}
               onSaveToDisk={handleSaveToDisk}
               onTogglePause={handleTogglePause}
               onDelete={(id) => {
@@ -612,6 +630,8 @@ export default function App() {
                 showToast('İndirme silindi');
               }}
               selectedCategoryName={getCategoryTitle()}
+              selectedAddressFilter={selectedAddressFilter}
+              onSelectAddressFilter={setSelectedAddressFilter}
             />
           </div>
         </div>
@@ -656,6 +676,26 @@ export default function App() {
         onSaveToDisk={handleSaveToDisk}
         onOpenPreview={(item) => setPreviewItem(item)}
         onChangeConnections={handleChangeConnections}
+        onWatchNow={(item) => setWatchNowItem(item)}
+        onShowInFolder={(item) => setFolderItem(item)}
+      />
+
+      {/* Video İzleme Modalı (Eşzamanlı Canlı Oynatıcı) */}
+      <VideoPlayerModal
+        item={watchNowItem}
+        isOpen={!!watchNowItem}
+        onClose={() => setWatchNowItem(null)}
+        onShowInFolder={(item) => setFolderItem(item)}
+        onSaveToDisk={handleSaveToDisk}
+      />
+
+      {/* Klasörde Göster Modalı (Dosya Yolu ve Explorer) */}
+      <FolderExplorerModal
+        item={folderItem}
+        isOpen={!!folderItem}
+        onClose={() => setFolderItem(null)}
+        onWatchNow={(item) => setWatchNowItem(item)}
+        onSaveToDisk={handleSaveToDisk}
       />
 
       <VideoPreviewModal

@@ -33,6 +33,16 @@ export const DeepSnifferView: React.FC<DeepSnifferViewProps> = ({
 
   const sampleSites = [
     {
+      title: 'The Dog Stars 2 (HDFilmCehennemi)',
+      url: 'https://www.hdfilmcehennemi.nl/the-dog-stars-2/',
+      badge: '1080p FHD / HLS / Dublaj',
+    },
+    {
+      title: 'YouTube (wCyyVuDIsrg)',
+      url: 'https://www.youtube.com/watch?v=wCyyVuDIsrg',
+      badge: '1080p 60fps / M4A',
+    },
+    {
       title: 'Tears of Steel (4K Sci-Fi)',
       url: 'https://example-media.com/videos/tears-of-steel',
       badge: '4K / HLS / MP4',

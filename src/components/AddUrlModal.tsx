@@ -26,6 +26,8 @@ export const AddUrlModal: React.FC<AddUrlModalProps> = ({
   const [error, setError] = useState('');
 
   const sampleUrls = [
+    { label: '🎬 The Dog Stars 2 (HDFilmCehennemi)', url: 'https://www.hdfilmcehennemi.nl/the-dog-stars-2/' },
+    { label: '▶️ YouTube (wCyyVuDIsrg)', url: 'https://www.youtube.com/watch?v=wCyyVuDIsrg' },
     { label: 'Tears of Steel 4K', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4' },
     { label: 'Big Buck Bunny 1080p', url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' },
     { label: 'Mux HLS Akışı (.m3u8)', url: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8' },

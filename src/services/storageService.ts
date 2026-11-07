@@ -1,8 +1,8 @@
 import { DownloadItem, IDMPresetSettings } from '../types/idm';
 import { createSegments } from './sniffService';
 
-const STORAGE_KEY_DOWNLOADS = 'idm_downloads_v1';
-const STORAGE_KEY_SETTINGS = 'idm_preset_settings_v1';
+const STORAGE_KEY_DOWNLOADS = 'savetovideo_downloads_v3';
+const STORAGE_KEY_SETTINGS = 'savetovideo_preset_settings_v3';
 
 export const DEFAULT_PRESET_SETTINGS: IDMPresetSettings = {
   autoDownload: false, // "istenilirse otomatik ayarlanıp hep aynı ayarda indir denilebilsin"
@@ -39,71 +39,102 @@ export function getInitialDownloads(): DownloadItem[] {
     const raw = localStorage.getItem(STORAGE_KEY_DOWNLOADS);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        const hasDogStars = parsed.some(p => p.id === 'dl-dogstars');
+        const hasYouTube = parsed.some(p => p.id === 'dl-youtube');
+        if (hasDogStars && hasYouTube) return parsed;
+      }
     }
   } catch (e) {
     console.error('Failed to load initial downloads:', e);
   }
 
-  // Realistic seed downloads showcasing SaveToVideo capabilities
-  const sample1Size = 345000000;
-  const sample1Segments = createSegments(sample1Size, 8);
-  sample1Segments.forEach((seg, idx) => {
-    const ratio = Math.min(1, 0.45 + idx * 0.05);
+  // Active multi-thread segments for YouTube item
+  const ytSize = 485000000;
+  const ytSegments = createSegments(ytSize, 8);
+  ytSegments.forEach((seg, idx) => {
+    const ratio = Math.min(1, 0.55 + idx * 0.05);
     seg.downloadedBytes = Math.floor((seg.endByte - seg.startByte) * ratio);
     seg.progressPercent = Math.floor(ratio * 100);
-    seg.speed = 1850000 + idx * 250000;
+    seg.speed = 2100000 + idx * 220000;
     seg.status = 'active';
   });
-
-  const downloadedSample1 = sample1Segments.reduce((acc, s) => acc + s.downloadedBytes, 0);
+  const ytDownloaded = ytSegments.reduce((acc, s) => acc + s.downloadedBytes, 0);
 
   return [
     {
-      id: 'dl-1',
+      id: 'dl-dogstars',
+      sourceAddress: 'https://www.hdfilmcehennemi.nl/the-dog-stars-2/',
+      pageUrl: 'https://www.hdfilmcehennemi.nl/the-dog-stars-2/',
       url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
-      fileName: 'Tears_of_Steel_1080p_60fps.mp4',
+      fileName: 'The_Dog_Stars_2_Turkce_Dublaj_1080p_FHD.mp4',
       category: 'video',
-      fileSize: sample1Size,
-      downloadedBytes: downloadedSample1,
-      progress: Math.floor((downloadedSample1 / sample1Size) * 100),
-      speed: 16500000, // 16.5 MB/s
-      speedFormatted: '16.5 MB/s',
-      timeLeft: '00:00:11',
-      status: 'downloading',
-      connections: 8,
-      segments: sample1Segments,
-      savePath: 'C:\\Users\\Downloads\\SaveToVideo_Videos\\Tears_of_Steel_1080p_60fps.mp4',
-      addedAt: Date.now() - 35000,
-      quality: '1080p (FHD)',
+      fileSize: 1980000000,
+      downloadedBytes: 1980000000,
+      progress: 100,
+      speed: 0,
+      speedFormatted: '0 B/s',
+      timeLeft: 'Tamamlandı',
+      status: 'completed',
+      connections: 16,
+      segments: createSegments(1980000000, 16).map(s => ({ ...s, progressPercent: 100, downloadedBytes: s.endByte - s.startByte, status: 'completed' as const })),
+      savePath: 'C:\\Users\\Downloads\\SaveToVideo_Videos\\The_Dog_Stars_2_Turkce_Dublaj_1080p_FHD.mp4',
+      addedAt: Date.now() - 1800000,
+      completedAt: Date.now() - 1720000,
+      quality: '1080p (FHD Dual Dublaj)',
       format: 'MP4',
-      codec: 'AVC1 / H.264 High@4.2',
+      codec: 'H.264 / AAC 5.1 Dublaj',
       acceptRanges: true,
     },
     {
-      id: 'dl-2',
+      id: 'dl-youtube',
+      sourceAddress: 'https://www.youtube.com/watch?v=wCyyVuDIsrg',
+      pageUrl: 'https://www.youtube.com/watch?v=wCyyVuDIsrg',
       url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-      fileName: 'Big_Buck_Bunny_Blender_Animation_720p.mp4',
+      fileName: 'YouTube_wCyyVuDIsrg_Master_1080p_60fps.mp4',
       category: 'video',
-      fileSize: 94000000,
-      downloadedBytes: 94000000,
+      fileSize: ytSize,
+      downloadedBytes: ytDownloaded,
+      progress: Math.floor((ytDownloaded / ytSize) * 100),
+      speed: 18400000, // 18.4 MB/s
+      speedFormatted: '18.4 MB/s',
+      timeLeft: '00:00:09',
+      status: 'downloading',
+      connections: 8,
+      segments: ytSegments,
+      savePath: 'C:\\Users\\Downloads\\SaveToVideo_Videos\\YouTube_wCyyVuDIsrg_Master_1080p_60fps.mp4',
+      addedAt: Date.now() - 45000,
+      quality: '1080p (60fps)',
+      format: 'MP4',
+      codec: 'AVC1 / H.264 High@4.2 + Opus',
+      acceptRanges: true,
+    },
+    {
+      id: 'dl-1',
+      sourceAddress: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+      url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+      fileName: 'Tears_of_Steel_1080p_60fps.mp4',
+      category: 'video',
+      fileSize: 345000000,
+      downloadedBytes: 345000000,
       progress: 100,
       speed: 0,
       speedFormatted: '0 B/s',
       timeLeft: 'Tamamlandı',
       status: 'completed',
       connections: 8,
-      segments: createSegments(94000000, 8).map(s => ({ ...s, progressPercent: 100, downloadedBytes: s.endByte - s.startByte, status: 'completed' as const })),
-      savePath: 'C:\\Users\\Downloads\\SaveToVideo_Videos\\Big_Buck_Bunny_Blender_Animation_720p.mp4',
+      segments: createSegments(345000000, 8).map(s => ({ ...s, progressPercent: 100, downloadedBytes: s.endByte - s.startByte, status: 'completed' as const })),
+      savePath: 'C:\\Users\\Downloads\\SaveToVideo_Videos\\Tears_of_Steel_1080p_60fps.mp4',
       addedAt: Date.now() - 3600000,
       completedAt: Date.now() - 3550000,
-      quality: '720p (HD)',
+      quality: '1080p (FHD)',
       format: 'MP4',
-      codec: 'H.264 / AAC',
+      codec: 'AVC1 / H.264 High@4.2',
       acceptRanges: true,
     },
     {
       id: 'dl-3',
+      sourceAddress: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
       url: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
       fileName: 'Mux_HLS_Adaptive_Stream_Master.m3u8',
       category: 'video',
@@ -121,28 +152,6 @@ export function getInitialDownloads(): DownloadItem[] {
       quality: '1080p (FHD)',
       format: 'M3U8',
       codec: 'Apple HLS V4',
-      acceptRanges: true,
-    },
-    {
-      id: 'dl-4',
-      url: 'https://example-media.com/audio/podcast-ep-42.mp3',
-      fileName: 'Teknoloji_Gundemi_Bolum_42.mp3',
-      category: 'music',
-      fileSize: 45000000,
-      downloadedBytes: 45000000,
-      progress: 100,
-      speed: 0,
-      speedFormatted: '0 B/s',
-      timeLeft: 'Tamamlandı',
-      status: 'completed',
-      connections: 4,
-      segments: createSegments(45000000, 4).map(s => ({ ...s, progressPercent: 100, status: 'completed' as const })),
-      savePath: 'C:\\Users\\Downloads\\SaveToVideo_Music\\Teknoloji_Gundemi_Bolum_42.mp3',
-      addedAt: Date.now() - 86400000,
-      completedAt: Date.now() - 86350000,
-      quality: 'Audio (320k)',
-      format: 'MP3',
-      codec: 'MPEG Layer 3',
       acceptRanges: true,
     }
   ];

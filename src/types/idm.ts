@@ -33,6 +33,9 @@ export interface DownloadItem {
   format?: string;
   codec?: string;
   acceptRanges: boolean;
+  sourceAddress?: string; // The website source URL, e.g. https://www.hdfilmcehennemi.nl/...
+  pageUrl?: string;
+  thumbnail?: string;
 }
 
 export interface DetectedStream {

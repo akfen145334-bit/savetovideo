@@ -8,7 +8,8 @@ import {
   FolderOpen,
   Eye,
   Download,
-  Terminal
+  Terminal,
+  PlaySquare
 } from 'lucide-react';
 import { DownloadItem } from '../types/idm';
 import { formatBytes, formatSpeed } from '../services/sniffService';
@@ -20,6 +21,8 @@ interface IDMSegmentDialogProps {
   onSaveToDisk: (item: DownloadItem) => void;
   onOpenPreview: (item: DownloadItem) => void;
   onChangeConnections: (itemId: string, newCount: number) => void;
+  onWatchNow?: (item: DownloadItem) => void;
+  onShowInFolder?: (item: DownloadItem) => void;
 }
 
 export const IDMSegmentDialog: React.FC<IDMSegmentDialogProps> = ({
@@ -29,6 +32,8 @@ export const IDMSegmentDialog: React.FC<IDMSegmentDialogProps> = ({
   onSaveToDisk,
   onOpenPreview,
   onChangeConnections,
+  onWatchNow,
+  onShowInFolder,
 }) => {
   if (!item) return null;
 
@@ -278,6 +283,29 @@ export const IDMSegmentDialog: React.FC<IDMSegmentDialogProps> = ({
                 </>
               )}
             </button>
+
+            {/* Can Watch Now concurrently anytime if stream is available */}
+            {onWatchNow && (
+              <button
+                onClick={() => onWatchNow(item)}
+                className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-semibold transition-colors flex items-center gap-1.5 shadow-2xs"
+                title="İndirme devam ederken veya tamamlandığında videoyu hemen oynat"
+              >
+                <PlaySquare className="w-3.5 h-3.5 text-blue-100" />
+                <span>Şimdi İzle</span>
+              </button>
+            )}
+
+            {onShowInFolder && (
+              <button
+                onClick={() => onShowInFolder(item)}
+                className="px-3 py-1.5 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 border border-neutral-300 dark:border-neutral-600 rounded-md font-medium transition-colors flex items-center gap-1.5 shadow-2xs"
+                title="Dosyanın kayıt edildiği klasörü ve dosya yolunu göster"
+              >
+                <FolderOpen className="w-3.5 h-3.5 text-amber-500" />
+                <span>Klasörde Göster</span>
+              </button>
+            )}
 
             {item.status === 'completed' && (
               <>
