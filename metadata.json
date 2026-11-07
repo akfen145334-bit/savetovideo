@@ -1,0 +1,8 @@
+{
+  "name": "IDM Web Suite & Deep Video Sniffer",
+  "description": "Internet Download Manager alternatifi, derin video ve medya yakalayıcı, çok kanallı hızlandırılmış indirme yöneticisi ve Chrome eklenti entegrasyonu.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
