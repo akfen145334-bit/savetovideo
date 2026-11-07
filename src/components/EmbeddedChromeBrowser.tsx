@@ -40,7 +40,7 @@ export const EmbeddedChromeBrowser: React.FC<EmbeddedChromeBrowserProps> = ({
       url: 'https://cinema-stream.org/watch/tears-of-steel',
       videoSrc: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
       poster: 'https://images.unsplash.com/photo-1536240478700-b869070f9279?auto=format&fit=crop&w=800&q=80',
-      desc: 'Amsterdam VFX tarafından üretilen açık kaynaklı 4K bilim kurgu filmi. IDM, sayfadaki video oynatıcıyı otomatik tespit etmiştir.',
+      desc: 'Amsterdam VFX tarafından üretilen açık kaynaklı 4K bilim kurgu filmi. SaveToVideo, sayfadaki video oynatıcıyı otomatik tespit etmiştir.',
       streams: [
         {
           id: 'tos-4k',
@@ -155,7 +155,7 @@ export const EmbeddedChromeBrowser: React.FC<EmbeddedChromeBrowserProps> = ({
       url: 'https://live-broadcasting.tv/stream/mux-adaptive',
       videoSrc: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
       poster: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80',
-      desc: 'Canlı HLS adaptif akış iletimi. IDM, .m3u8 manifestini ve tüm TS parçalarını anında yakalar.',
+      desc: 'Canlı HLS adaptif akış iletimi. SaveToVideo, .m3u8 manifestini ve tüm TS parçalarını anında yakalar.',
       streams: [
         {
           id: 'mux-m3u8',
@@ -208,7 +208,7 @@ export const EmbeddedChromeBrowser: React.FC<EmbeddedChromeBrowserProps> = ({
         url: targetUrl,
         videoSrc: sniffResult.streams[0]?.url || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
         poster: sniffResult.thumbnail || 'https://images.unsplash.com/photo-1536240478700-b869070f9279?auto=format&fit=crop&w=800&q=80',
-        desc: `IDM bu sayfada ${sniffResult.streamsCount} adet indirilebilir akış ve çözünürlük buldu.`,
+        desc: `SaveToVideo bu sayfada ${sniffResult.streamsCount} adet indirilebilir akış ve çözünürlük buldu.`,
         streams: sniffResult.streams,
       };
 
@@ -238,7 +238,7 @@ export const EmbeddedChromeBrowser: React.FC<EmbeddedChromeBrowserProps> = ({
     }
   };
 
-  const handleIDMDownloadClick = () => {
+  const handleSaveToVideoDownloadClick = () => {
     onTriggerSnifferModal(activeTab.streams, activeTab.title, activeTab.url);
   };
 
@@ -252,16 +252,16 @@ export const EmbeddedChromeBrowser: React.FC<EmbeddedChromeBrowserProps> = ({
           </div>
           <div>
             <h3 className="font-semibold text-neutral-900 dark:text-neutral-100 text-xs">
-              Google Chrome İçine Gömülü IDM Video Yakalayıcı Simülasyonu
+              Google Chrome İçine Gömülü SaveToVideo Video Yakalayıcı Simülasyonu
             </h3>
             <p className="text-[11px] text-neutral-600 dark:text-neutral-400 mt-0.5">
-              Chrome'da açılan her video oynatıcısının üzerinde IDM'in meşhur <strong>"Bu Videoyu İndir"</strong> paneli otomatik olarak belirir. Adres çubuğuna dilediğiniz video sitesini yazıp Enter'a basabilirsiniz.
+              Chrome'da açılan her video oynatıcısının üzerinde SaveToVideo'nun meşhur <strong>"Bu Videoyu İndir"</strong> paneli otomatik olarak belirir. Adres çubuğuna dilediğiniz video sitesini yazıp Enter'a basabilirsiniz.
             </p>
           </div>
         </div>
 
         <button
-          onClick={handleIDMDownloadClick}
+          onClick={handleSaveToVideoDownloadClick}
           className="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-lg shrink-0 shadow-2xs flex items-center gap-1.5 transition-colors"
         >
           <Download className="w-3.5 h-3.5" />
@@ -360,14 +360,14 @@ export const EmbeddedChromeBrowser: React.FC<EmbeddedChromeBrowserProps> = ({
 
           {/* Chrome Extensions Area */}
           <div className="flex items-center gap-2 shrink-0">
-            {/* IDM Extension Icon with Live Detection Badge */}
+            {/* SaveToVideo Extension Icon with Live Detection Badge */}
             <button
-              onClick={handleIDMDownloadClick}
-              title={`IDM Video Yakalayıcı: Bu sekmede ${activeTab.streams.length} adet video akışı yakalandı`}
+              onClick={handleSaveToVideoDownloadClick}
+              title={`SaveToVideo: Bu sekmede ${activeTab.streams.length} adet video akışı yakalandı`}
               className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-sky-50 dark:bg-sky-950/60 border border-sky-300 dark:border-sky-800 text-sky-700 dark:text-sky-300 font-semibold hover:bg-sky-100 transition-colors shadow-2xs"
             >
               <Puzzle className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
-              <span>IDM</span>
+              <span>STV</span>
               <span className="w-4 h-4 rounded-full bg-emerald-500 text-white font-mono text-[9px] flex items-center justify-center font-bold">
                 {activeTab.streams.length}
               </span>
@@ -377,13 +377,13 @@ export const EmbeddedChromeBrowser: React.FC<EmbeddedChromeBrowserProps> = ({
 
         {/* Chrome Webpage Content Area with HTML5 Video */}
         <div className="bg-neutral-900 relative min-h-[380px] flex flex-col justify-center items-center">
-          {/* THE FAMOUS FLOATING IDM VIDEO DOWNLOAD PANEL (Gömülü IDM Butonu) */}
+          {/* THE FAMOUS FLOATING VIDEO DOWNLOAD PANEL (Gömülü SaveToVideo Butonu) */}
           <div 
-            onClick={handleIDMDownloadClick}
+            onClick={handleSaveToVideoDownloadClick}
             className="absolute top-4 right-4 z-30 cursor-pointer bg-neutral-900/90 hover:bg-sky-600 border border-white/20 hover:border-sky-400 backdrop-blur-md text-white px-3.5 py-1.5 rounded-lg shadow-xl flex items-center gap-2 transition-all transform hover:-translate-y-0.5 group select-none"
           >
-            <div className="w-4 h-4 rounded bg-sky-500 group-hover:bg-white text-white group-hover:text-sky-600 flex items-center justify-center font-bold text-[9px]">
-              IDM
+            <div className="w-6 h-4 rounded bg-sky-500 group-hover:bg-white text-white group-hover:text-sky-600 flex items-center justify-center font-bold text-[8px]">
+              STV
             </div>
             <span className="font-semibold text-xs tracking-wide">
               Bu Videoyu İndir
@@ -427,7 +427,7 @@ export const EmbeddedChromeBrowser: React.FC<EmbeddedChromeBrowserProps> = ({
             </button>
 
             <button
-              onClick={handleIDMDownloadClick}
+              onClick={handleSaveToVideoDownloadClick}
               className="px-3.5 py-1.5 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-md shadow-2xs flex items-center gap-1.5 transition-colors"
             >
               <Download className="w-3.5 h-3.5" />
@@ -443,7 +443,7 @@ export const EmbeddedChromeBrowser: React.FC<EmbeddedChromeBrowserProps> = ({
               <div className="flex items-center gap-2">
                 <Activity className="w-3.5 h-3.5 text-emerald-400" />
                 <span className="font-semibold text-neutral-200">
-                  Chrome Ağ Akışı Dinleyicisi (IDM Deep Network Sniffer)
+                  Chrome Ağ Akışı Dinleyicisi (SaveToVideo Deep Network Sniffer)
                 </span>
               </div>
               <span className="text-[10px] text-emerald-400">
@@ -463,7 +463,7 @@ export const EmbeddedChromeBrowser: React.FC<EmbeddedChromeBrowserProps> = ({
                     <span className="text-neutral-400">{s.sizeFormatted}</span>
                     <span className="text-neutral-500">{s.mimeType}</span>
                     <button
-                      onClick={handleIDMDownloadClick}
+                      onClick={handleSaveToVideoDownloadClick}
                       className="px-2 py-0.5 bg-sky-700 hover:bg-sky-600 text-white rounded text-[10px] font-sans font-semibold"
                     >
                       Yakala

@@ -44,11 +44,11 @@ export const ChromeExtensionView: React.FC = () => {
               <Chrome className="w-5 h-5" />
             </div>
             <h2 className="text-base font-bold text-neutral-900 dark:text-neutral-100">
-              IDM Chrome Entegrasyon Eklentisi (Manifest V3)
+              SaveToVideo Chrome Entegrasyon Eklentisi (Manifest V3)
             </h2>
           </div>
           <p className="text-neutral-500 dark:text-neutral-400 text-xs leading-relaxed">
-            Google Chrome tarayıcınıza yükleyerek ziyaret ettiğiniz her web sitesinde (YouTube, Vimeo, sosyal medya, haber ve video portalları) oynatılan videoları otomatik yakalayın. Videoların sağ üstünde <strong>"Bu Videoyu İndir (IDM)"</strong> paneli belirir.
+            Google Chrome tarayıcınıza yükleyerek ziyaret ettiğiniz her web sitesinde (YouTube, Vimeo, sosyal medya, haber ve video portalları) oynatılan videoları otomatik yakalayın. Videoların sağ üstünde <strong>"Bu Videoyu İndir (SaveToVideo)"</strong> paneli belirir.
           </p>
         </div>
 
@@ -58,7 +58,7 @@ export const ChromeExtensionView: React.FC = () => {
           className="px-5 py-3 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-lg text-xs transition-colors shadow-sm flex items-center gap-2 shrink-0"
         >
           <Download className="w-4 h-4" />
-          <span>{isDownloading ? 'Paketleniyor...' : 'Chrome Eklentisini İndir (.ZIP)'}</span>
+          <span>{isDownloading ? 'Paketleniyor...' : 'SaveToVideo Eklentisini İndir (.ZIP)'}</span>
         </button>
       </div>
 

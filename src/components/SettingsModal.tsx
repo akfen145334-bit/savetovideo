@@ -76,7 +76,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           <div className="flex items-center gap-2">
             <Settings className="w-4 h-4 text-sky-600 dark:text-sky-400" />
             <h3 className="font-semibold text-neutral-900 dark:text-neutral-100 text-sm">
-              IDM İndirme Seçenekleri &amp; Otomatik Ön Ayarlar
+              SaveToVideo İndirme Seçenekleri &amp; Otomatik Ön Ayarlar
             </h3>
           </div>
           <button
@@ -209,7 +209,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <Volume2 className="w-4 h-4 text-neutral-400" />
               <div>
                 <span className="font-semibold block text-xs">İndirme tamamlandığında ses çal</span>
-                <span className="text-[11px] text-neutral-500">IDM klasik tamamlanma zil sesi</span>
+                <span className="text-[11px] text-neutral-500">SaveToVideo klasik tamamlanma zil sesi</span>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -230,7 +230,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
           </div>
 
-          {/* Backup / Export / Import IDM list */}
+          {/* Backup / Export / Import SaveToVideo list */}
           <div className="p-3 bg-neutral-50 dark:bg-neutral-800/60 rounded-lg border border-neutral-200 dark:border-neutral-700/80 space-y-2">
             <span className="font-semibold text-neutral-800 dark:text-neutral-200 block text-xs">
               İndirme Listesi Yedekleme &amp; Dışa/İçe Aktar:

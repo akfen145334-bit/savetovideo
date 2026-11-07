@@ -274,7 +274,7 @@ export const IDMDownloadsTable: React.FC<IDMDownloadsTableProps> = ({
 
                     <button
                       onClick={() => onOpenSegmentDialog(item)}
-                      title="Parçalı İndirme Durumu ve Bağlantı Ayrıntıları (IDM Ekranı)"
+                      title="Parçalı İndirme Durumu ve Bağlantı Ayrıntıları (SaveToVideo Ekranı)"
                       className="p-1 rounded text-neutral-500 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
                     >
                       <ExternalLink className="w-3.5 h-3.5" />

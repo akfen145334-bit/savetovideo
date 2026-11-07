@@ -95,7 +95,7 @@ export const DeepSnifferView: React.FC<DeepSnifferViewProps> = ({
         <div>
           <h2 className="text-base font-bold text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
             <Search className="w-5 h-5 text-sky-600 dark:text-sky-400" />
-            <span>IDM Derin Medya &amp; Video Tarayıcı Motoru</span>
+            <span>SaveToVideo Derin Medya &amp; Video Tarayıcı Motoru</span>
           </h2>
           <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 max-w-2xl leading-relaxed">
             İnternette herhangi bir web sitesinde (YouTube, Vimeo, sosyal medya, haber portalları, dizi-film siteleri vb.) oynatılan videoyu en derin katmanlarına kadar araştırır; doğrudan MP4, HLS (.m3u8), DASH ve ayrık ses parçalarını tek tıkla bulur.

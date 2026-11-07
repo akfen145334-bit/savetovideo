@@ -41,11 +41,11 @@ export const IDMSegmentDialog: React.FC<IDMSegmentDialogProps> = ({
         className="w-full max-w-2xl bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-xl shadow-2xl overflow-hidden text-xs font-sans"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Classic IDM Header Bar */}
+        {/* Classic SaveToVideo Header Bar */}
         <div className="bg-neutral-100 dark:bg-neutral-800 px-4 py-3 border-b border-neutral-200 dark:border-neutral-700 flex items-center justify-between">
           <div className="flex items-center gap-2 truncate max-w-md">
-            <div className="w-5 h-5 rounded bg-sky-600 text-white flex items-center justify-center font-bold text-[10px]">
-              IDM
+            <div className="w-6 h-5 rounded bg-sky-600 text-white flex items-center justify-center font-bold text-[9px]">
+              STV
             </div>
             <span className="font-semibold text-neutral-900 dark:text-neutral-100 text-sm truncate">
               İndirme Durumu: {item.fileName}
@@ -134,7 +134,7 @@ export const IDMSegmentDialog: React.FC<IDMSegmentDialogProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5 font-semibold text-neutral-800 dark:text-neutral-200">
                 <Layers className="w-3.5 h-3.5 text-sky-500" />
-                <span>Eşzamanlı Bağlantı Segmentleri (IDM Chunk Threads)</span>
+                <span>Eşzamanlı Bağlantı Segmentleri (SaveToVideo Çok Kanallı Parçalar)</span>
               </div>
 
               {/* Dynamic Connection Switcher */}
@@ -247,7 +247,7 @@ export const IDMSegmentDialog: React.FC<IDMSegmentDialogProps> = ({
 
               {showLogs && (
                 <div className="mt-2 p-2.5 bg-neutral-950 text-neutral-300 rounded font-mono text-[10px] max-h-24 overflow-y-auto space-y-1">
-                  <div>[IDM Motoru] HTTP/1.1 Range: bytes isteği başlatıldı. Sunucu: HTTP 206 Partial Content</div>
+                  <div>[SaveToVideo Motoru] HTTP/1.1 Range: bytes isteği başlatıldı. Sunucu: HTTP 206 Partial Content</div>
                   {item.segments.map((s) => (
                     <div key={s.id} className="text-emerald-400">
                       [Kanal #{s.id}] GET Range: bytes={s.startByte}-{s.endByte} &rarr; 206 OK ({formatSpeed(s.speed)})

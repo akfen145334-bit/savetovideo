@@ -718,7 +718,7 @@ async function startServer() {
   }
 
   app.listen(PORT, () => {
-    console.log(`IDM Web Server running at http://localhost:${PORT}`);
+    console.log(`SaveToVideo Web Server running at http://localhost:${PORT}`);
   });
 }
 

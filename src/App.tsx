@@ -32,8 +32,12 @@ import { EmbeddedChromeBrowser } from './components/EmbeddedChromeBrowser';
 import { ChromeExtensionView } from './components/ChromeExtensionView';
 import { AddUrlModal } from './components/AddUrlModal';
 import { VideoPreviewModal } from './components/VideoPreviewModal';
+import { PortabilityHubView } from './components/PortabilityHubView';
+import { OfflineIndicator } from './components/PWAInstallButton';
+import { useOnlineStatus } from './hooks/usePWAInstall';
 
 export default function App() {
+  const isOnline = useOnlineStatus();
   // Theme state
   const [isDark, setIsDark] = useState<boolean>(() => {
     return document.documentElement.classList.contains('dark') || 
@@ -624,6 +628,12 @@ export default function App() {
         <ChromeExtensionView />
       )}
 
+      {activeTab === 'portability' && (
+        <PortabilityHubView />
+      )}
+
+      <OfflineIndicator isOnline={isOnline} />
+
       {/* Modals */}
       <IDMSegmentDialog
         item={segmentModalItem}
@@ -659,7 +669,7 @@ export default function App() {
         settings={settings}
         onSave={(newSettings) => {
           setSettings(newSettings);
-          showToast('IDM ayarları başarıyla güncellendi');
+          showToast('SaveToVideo ayarları başarıyla güncellendi');
         }}
         onExportDownloads={handleExportDownloads}
         onImportDownloads={handleImportDownloads}

@@ -62,8 +62,8 @@ export const DownloadSetupModal: React.FC<DownloadSetupModalProps> = ({
         {/* Header */}
         <div className="bg-neutral-100 dark:bg-neutral-800 px-5 py-3.5 border-b border-neutral-200 dark:border-neutral-700 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-6 h-6 rounded bg-sky-600 text-white flex items-center justify-center font-bold text-xs">
-              IDM
+            <div className="w-7 h-6 rounded bg-sky-600 text-white flex items-center justify-center font-bold text-[10px]">
+              STV
             </div>
             <div>
               <h3 className="font-semibold text-neutral-900 dark:text-neutral-100 text-sm">
@@ -168,7 +168,7 @@ export const DownloadSetupModal: React.FC<DownloadSetupModalProps> = ({
             </div>
 
             <p className="text-[11px] text-neutral-500 dark:text-neutral-400 leading-relaxed">
-              IDM çok kanallı indirme motoru, dosyayı eşzamanlı bayt aralıklarına bölerek internet bant genişliğini tam verimle kullanır (HTTP Range Acceleration).
+              SaveToVideo çok kanallı indirme motoru, dosyayı eşzamanlı bayt aralıklarına bölerek internet bant genişliğini tam verimle kullanır (HTTP Range Acceleration).
             </p>
           </div>
 

@@ -108,7 +108,7 @@ export const AddUrlModal: React.FC<AddUrlModalProps> = ({
               💡 <strong>Derin Araştır &amp; Bul</strong> seçildiğinde: Web sayfasındaki tüm video çözünürlükleri (4K, 1080p, 720p, ses) taranıp seçim ekranında sunulur.
             </p>
             <p>
-              ⚡ <strong>Doğrudan İndir</strong> seçildiğinde: Bağlantı doğrudan IDM çok kanallı indirme motoruna aktarılır.
+              ⚡ <strong>Doğrudan İndir</strong> seçildiğinde: Bağlantı doğrudan SaveToVideo çok kanallı indirme motoruna aktarılır.
             </p>
           </div>
         </div>

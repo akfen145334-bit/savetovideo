@@ -1,4 +1,4 @@
-// Web Audio API Synthesizer for IDM completion chime
+// Web Audio API Synthesizer for SaveToVideo completion chime
 export function playDownloadCompleteChime(): void {
   try {
     const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
@@ -7,7 +7,7 @@ export function playDownloadCompleteChime(): void {
     const ctx = new AudioContextClass();
     const now = ctx.currentTime;
 
-    // Dual-tone IDM chime (Tone 1: 587.33 Hz (D5), Tone 2: 880 Hz (A5))
+    // Dual-tone SaveToVideo chime (Tone 1: 587.33 Hz (D5), Tone 2: 880 Hz (A5))
     const osc1 = ctx.createOscillator();
     const gain1 = ctx.createGain();
 

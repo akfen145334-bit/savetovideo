@@ -31,8 +31,8 @@ export const StreamPickerModal: React.FC<StreamPickerModalProps> = ({
         {/* Header */}
         <div className="bg-neutral-100 dark:bg-neutral-800 px-5 py-3.5 border-b border-neutral-200 dark:border-neutral-700 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-6 h-6 rounded bg-sky-600 text-white flex items-center justify-center font-bold text-xs">
-              IDM
+            <div className="w-7 h-6 rounded bg-sky-600 text-white flex items-center justify-center font-bold text-[10px]">
+              STV
             </div>
             <div>
               <h3 className="font-semibold text-neutral-900 dark:text-neutral-100 text-sm">
@@ -150,7 +150,7 @@ export const StreamPickerModal: React.FC<StreamPickerModalProps> = ({
         <div className="bg-neutral-50 dark:bg-neutral-800/80 px-5 py-3 border-t border-neutral-200 dark:border-neutral-700 flex items-center justify-between text-neutral-500 text-[11px]">
           <div className="flex items-center gap-1.5">
             <Layers className="w-3.5 h-3.5 text-sky-500" />
-            <span>IDM Çok Kanallı İndirme Motoru aktiftir</span>
+            <span>SaveToVideo Çok Kanallı İndirme Motoru aktiftir</span>
           </div>
           <button
             onClick={onClose}

@@ -8,7 +8,7 @@ export const DEFAULT_PRESET_SETTINGS: IDMPresetSettings = {
   autoDownload: false, // "istenilirse otomatik ayarlanıp hep aynı ayarda indir denilebilsin"
   defaultConnections: 8, // 8 parallel chunk connections
   preferredQuality: '1080p',
-  defaultSavePath: 'C:\\Users\\Downloads\\IDM_Videos\\',
+  defaultSavePath: 'C:\\Users\\Downloads\\SaveToVideo_Videos\\',
   speedLimitEnabled: false,
   speedLimitKBps: 10000,
   playSoundOnComplete: true,
@@ -21,7 +21,7 @@ export function loadStoredSettings(): IDMPresetSettings {
     const raw = localStorage.getItem(STORAGE_KEY_SETTINGS);
     if (raw) return { ...DEFAULT_PRESET_SETTINGS, ...JSON.parse(raw) };
   } catch (e) {
-    console.error('Failed to load IDM settings:', e);
+    console.error('Failed to load SaveToVideo settings:', e);
   }
   return DEFAULT_PRESET_SETTINGS;
 }
@@ -30,7 +30,7 @@ export function saveStoredSettings(settings: IDMPresetSettings): void {
   try {
     localStorage.setItem(STORAGE_KEY_SETTINGS, JSON.stringify(settings));
   } catch (e) {
-    console.error('Failed to save IDM settings:', e);
+    console.error('Failed to save SaveToVideo settings:', e);
   }
 }
 
@@ -45,7 +45,7 @@ export function getInitialDownloads(): DownloadItem[] {
     console.error('Failed to load initial downloads:', e);
   }
 
-  // Realistic seed downloads showcasing IDM capabilities
+  // Realistic seed downloads showcasing SaveToVideo capabilities
   const sample1Size = 345000000;
   const sample1Segments = createSegments(sample1Size, 8);
   sample1Segments.forEach((seg, idx) => {
@@ -73,7 +73,7 @@ export function getInitialDownloads(): DownloadItem[] {
       status: 'downloading',
       connections: 8,
       segments: sample1Segments,
-      savePath: 'C:\\Users\\Downloads\\IDM_Videos\\Tears_of_Steel_1080p_60fps.mp4',
+      savePath: 'C:\\Users\\Downloads\\SaveToVideo_Videos\\Tears_of_Steel_1080p_60fps.mp4',
       addedAt: Date.now() - 35000,
       quality: '1080p (FHD)',
       format: 'MP4',
@@ -94,7 +94,7 @@ export function getInitialDownloads(): DownloadItem[] {
       status: 'completed',
       connections: 8,
       segments: createSegments(94000000, 8).map(s => ({ ...s, progressPercent: 100, downloadedBytes: s.endByte - s.startByte, status: 'completed' as const })),
-      savePath: 'C:\\Users\\Downloads\\IDM_Videos\\Big_Buck_Bunny_Blender_Animation_720p.mp4',
+      savePath: 'C:\\Users\\Downloads\\SaveToVideo_Videos\\Big_Buck_Bunny_Blender_Animation_720p.mp4',
       addedAt: Date.now() - 3600000,
       completedAt: Date.now() - 3550000,
       quality: '720p (HD)',
@@ -116,7 +116,7 @@ export function getInitialDownloads(): DownloadItem[] {
       status: 'paused',
       connections: 16,
       segments: createSegments(280000000, 16),
-      savePath: 'C:\\Users\\Downloads\\IDM_Videos\\Mux_HLS_Adaptive_Stream_Master.mp4',
+      savePath: 'C:\\Users\\Downloads\\SaveToVideo_Videos\\Mux_HLS_Adaptive_Stream_Master.mp4',
       addedAt: Date.now() - 7200000,
       quality: '1080p (FHD)',
       format: 'M3U8',
@@ -137,7 +137,7 @@ export function getInitialDownloads(): DownloadItem[] {
       status: 'completed',
       connections: 4,
       segments: createSegments(45000000, 4).map(s => ({ ...s, progressPercent: 100, status: 'completed' as const })),
-      savePath: 'C:\\Users\\Downloads\\IDM_Music\\Teknoloji_Gundemi_Bolum_42.mp3',
+      savePath: 'C:\\Users\\Downloads\\SaveToVideo_Music\\Teknoloji_Gundemi_Bolum_42.mp3',
       addedAt: Date.now() - 86400000,
       completedAt: Date.now() - 86350000,
       quality: 'Audio (320k)',

@@ -10,9 +10,9 @@ export interface ExtensionFile {
 export function getChromeExtensionFiles(): ExtensionFile[] {
   const manifest = {
     manifest_version: 3,
-    name: "IDM Deep Video Grabber & Sniffer",
+    name: "SaveToVideo Deep Video Grabber & Sniffer",
     version: "3.2.0",
-    description: "İnternette herhangi bir sitede izlenen videoları en derin seviyede otomatik tespit eder ve IDM indirme motoruna aktarır.",
+    description: "İnternette herhangi bir sitede izlenen videoları en derin seviyede otomatik tespit eder ve SaveToVideo indirme motoruna aktarır.",
     permissions: [
       "activeTab",
       "storage",
@@ -25,7 +25,7 @@ export function getChromeExtensionFiles(): ExtensionFile[] {
     ],
     action: {
       default_popup: "popup.html",
-      default_title: "IDM Video Yakalayıcı"
+      default_title: "SaveToVideo Video Yakalayıcı"
     },
     background: {
       service_worker: "background.js"
@@ -41,7 +41,7 @@ export function getChromeExtensionFiles(): ExtensionFile[] {
     ]
   };
 
-  const backgroundJs = `// IDM Deep Video Sniffer - Background Service Worker (Manifest V3)
+  const backgroundJs = `// SaveToVideo Deep Video Sniffer - Background Service Worker (Manifest V3)
 const detectedMediaByTab = new Map();
 
 // Filter patterns for video streams & media files
@@ -146,7 +146,7 @@ chrome.tabs.onRemoved.addListener((tabId) => {
 });
 `;
 
-  const contentJs = `// IDM Floating Video Grabber - Content Script
+  const contentJs = `// SaveToVideo Floating Video Grabber - Content Script
 (function() {
   let detectedVideos = [];
   let floatingBar = null;
@@ -164,7 +164,7 @@ chrome.tabs.onRemoved.addListener((tabId) => {
           <polyline points="7 10 12 15 17 10"></polyline>
           <line x1="12" y1="15" x2="12" y2="3"></line>
         </svg>
-        <span>Bu Videoyu İndir (IDM)</span>
+        <span>Bu Videoyu İndir (SaveToVideo)</span>
         <span class="idm-counter">\${detectedVideos.length || 1}</span>
       </div>
     \`;
@@ -180,11 +180,11 @@ chrome.tabs.onRemoved.addListener((tabId) => {
     bar.addEventListener('click', (e) => {
       e.stopPropagation();
       const currentSrc = videoElement.currentSrc || videoElement.src;
-      showIDMQualityModal(currentSrc || window.location.href);
+      showSaveToVideoQualityModal(currentSrc || window.location.href);
     });
   }
 
-  function showIDMQualityModal(videoSrc) {
+  function showSaveToVideoQualityModal(videoSrc) {
     const existing = document.getElementById('idm-quality-dialog');
     if (existing) existing.remove();
 
@@ -195,7 +195,7 @@ chrome.tabs.onRemoved.addListener((tabId) => {
       <div class="idm-modal-card">
         <div class="idm-modal-header">
           <div class="idm-modal-title">
-            <strong>IDM Derin Medya İndirici</strong>
+            <strong>SaveToVideo Derin Medya İndirici</strong>
             <span>Tüm Çözünürlük ve Akışlar Tespit Edildi</span>
           </div>
           <button id="idm-modal-close">&times;</button>
@@ -237,7 +237,7 @@ chrome.tabs.onRemoved.addListener((tabId) => {
     document.getElementById('idm-modal-close').onclick = () => dialog.remove();
     dialog.querySelectorAll('.idm-dl-btn').forEach(btn => {
       btn.onclick = () => {
-        alert('IDM İndirme Motoru başlatıldı! Bağlantı: ' + btn.getAttribute('data-url'));
+        alert('SaveToVideo İndirme Motoru başlatıldı! Bağlantı: ' + btn.getAttribute('data-url'));
         dialog.remove();
       };
     });
@@ -263,7 +263,7 @@ chrome.tabs.onRemoved.addListener((tabId) => {
 })();
 `;
 
-  const contentCss = `/* IDM Floating Overlay Styles */
+  const contentCss = `/* SaveToVideo Floating Overlay Styles */
 .idm-floating-bar {
   position: absolute;
   top: 12px;
@@ -474,9 +474,9 @@ chrome.tabs.onRemoved.addListener((tabId) => {
 </head>
 <body>
   <div class="header">
-    <div class="logo">IDM</div>
+    <div class="logo">STV</div>
     <div>
-      <h2>IDM Video Yakalayıcı</h2>
+      <h2>SaveToVideo Video Yakalayıcı</h2>
       <div class="subtitle">Bu Sayfada Bulunan Medyalar</div>
     </div>
   </div>
@@ -507,7 +507,7 @@ chrome.tabs.onRemoved.addListener((tabId) => {
           <span>Tip: \${s.type}</span>
           <span>\${s.contentLength ? (s.contentLength / 1048576).toFixed(1) + ' MB' : 'Dinamik Akış'}</span>
         </div>
-        <button class="btn" data-url="\${s.url}">IDM ile İndir (8 Bağlantı)</button>
+        <button class="btn" data-url="\${s.url}">SaveToVideo ile İndir (8 Bağlantı)</button>
       \`;
       div.querySelector('button').onclick = () => {
         chrome.tabs.create({ url: 'http://localhost:3000/?url=' + encodeURIComponent(s.url) });
@@ -518,13 +518,13 @@ chrome.tabs.onRemoved.addListener((tabId) => {
 });
 `;
 
-  const readme = `# IDM Deep Video Grabber - Chrome Uzantısı Kurulum Rehberi
+  const readme = `# SaveToVideo Deep Video Grabber - Chrome Uzantısı Kurulum Rehberi
 
-Bu eklenti, Google Chrome'da ziyaret ettiğiniz **herhangi bir web sitesinde** (YouTube, Vimeo, Dailymotion, Twitter/X, haber siteleri, dizi/film portalları vb.) oynatılan tüm video ve ses akışlarını en derin seviyede yakalar ve IDM çok kanallı indirme motoruna aktarır.
+Bu eklenti, Google Chrome'da ziyaret ettiğiniz **herhangi bir web sitesinde** (YouTube, Vimeo, Dailymotion, Twitter/X, haber siteleri, dizi/film portalları vb.) oynatılan tüm video ve ses akışlarını en derin seviyede yakalar ve SaveToVideo çok kanallı indirme motoruna aktarır.
 
 ## Kurulum Adımları:
 
-1. Bu indirdiğiniz \`idm-chrome-extension.zip\` arşivini masaüstünüze bir klasöre çıkarın (Örn: \`idm-chrome-extension\`).
+1. Bu indirdiğiniz \`savetovideo-chrome-extension.zip\` arşivini masaüstünüze bir klasöre çıkarın (Örn: \`savetovideo-chrome-extension\`).
 2. Google Chrome tarayıcınızı açın ve adres çubuğuna şunu yazın:
    \`chrome://extensions\`
 3. Sağ üst köşedeki **"Geliştirici modu" (Developer mode)** anahtarını açık konuma getirin.
@@ -533,14 +533,14 @@ Bu eklenti, Google Chrome'da ziyaret ettiğiniz **herhangi bir web sitesinde** (
 6. Eklenti simgesi Chrome araç çubuğuna eklenecektir!
 
 ## Nasıl Çalışır?
-- Herhangi bir web sitesinde video açtığınızda videonun sağ üst köşesinde **"Bu Videoyu İndir (IDM)"** paneli belirecektir.
-- Tıkladığınızda 4K, 1080p, 720p ve Ses seçenekleri listelenir ve IDM motoruyla çok kanallı olarak indirilir!
+- Herhangi bir web sitesinde video açtığınızda videonun sağ üst köşesinde **"Bu Videoyu İndir (SaveToVideo)"** paneli belirecektir.
+- Tıkladığınızda 4K, 1080p, 720p ve Ses seçenekleri listelenir ve SaveToVideo motoruyla çok kanallı olarak indirilir!
 `;
 
   return [
     { name: 'manifest.json', path: 'manifest.json', content: JSON.stringify(manifest, null, 2), description: 'Chrome Manifest V3 Yapılandırma Dosyası' },
     { name: 'background.js', path: 'background.js', content: backgroundJs, description: 'Ağ İsteklerini İzleyen Arka Plan Servisi' },
-    { name: 'content.js', path: 'content.js', content: contentJs, description: 'Sayfadaki Videolara IDM Paneli Ekleyen Kod' },
+    { name: 'content.js', path: 'content.js', content: contentJs, description: 'Sayfadaki Videolara SaveToVideo Paneli Ekleyen Kod' },
     { name: 'content.css', path: 'content.css', content: contentCss, description: 'Gömülü Video İndirme Paneli Tasarımı' },
     { name: 'popup.html', path: 'popup.html', content: popupHtml, description: 'Eklenti Açılır Pencere Arayüzü' },
     { name: 'popup.js', path: 'popup.js', content: popupJs, description: 'Açılır Pencere Mantığı' },
@@ -565,7 +565,7 @@ export function downloadChromeExtensionZip(): void {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'idm-deep-video-grabber-chrome-extension.zip';
+    a.download = 'savetovideo-chrome-extension.zip';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
