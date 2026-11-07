@@ -116,16 +116,30 @@ export default function App() {
     setSelectedIds([]);
   };
 
-  // Save / Real download to user's disk
+  // Save / Real download to user's disk (Supports Netlify & full-stack server)
   const handleSaveToDisk = (item: DownloadItem) => {
-    const proxyUrl = `/api/download-proxy?url=${encodeURIComponent(item.url)}&filename=${encodeURIComponent(item.fileName)}`;
+    showToast(`${item.fileName} indiriliyor...`);
+
+    const isStaticHost = typeof window !== 'undefined' && (
+      window.location.hostname.includes('netlify.app') ||
+      window.location.hostname.includes('vercel.app') ||
+      window.location.hostname.includes('github.io')
+    );
+
+    const downloadUrl = isStaticHost 
+      ? item.url 
+      : `/api/download-proxy?url=${encodeURIComponent(item.url)}&filename=${encodeURIComponent(item.fileName)}`;
+
     const a = document.createElement('a');
-    a.href = proxyUrl;
+    a.href = downloadUrl;
     a.download = item.fileName;
+    if (isStaticHost) {
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+    }
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    showToast(`${item.fileName} bilgisayarınıza kaydediliyor...`);
   };
 
   // Real-time multi-connection download loop

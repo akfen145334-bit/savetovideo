@@ -45,12 +45,24 @@ export function createSegments(fileSize: number, connections: number): DownloadS
   return segments;
 }
 
-// Deep Media Sniffer Client
+// Deep Media Sniffer Client (Compatible with full-stack Node & Netlify static hosting)
 export async function sniffVideoMedia(targetUrl: string): Promise<SniffResult> {
   try {
+    const isStaticHost = typeof window !== 'undefined' && (
+      window.location.hostname.includes('netlify.app') ||
+      window.location.hostname.includes('vercel.app') ||
+      window.location.hostname.includes('github.io')
+    );
+
+    // On Netlify / static CDN where backend Express is absent, run client-side engine directly
+    if (isStaticHost) {
+      return getSimulatedSniffResult(targetUrl);
+    }
+
     const response = await fetch(`/api/sniff?url=${encodeURIComponent(targetUrl)}`);
-    if (!response.ok) {
-      throw new Error(`Sunucu yanıtı: ${response.status}`);
+    const contentType = response.headers.get('content-type') || '';
+    if (!response.ok || !contentType.includes('application/json')) {
+      throw new Error(`Sunucu yanıtı geçersiz veya API rota yok: ${response.status}`);
     }
     const data = await response.json();
     return data;
