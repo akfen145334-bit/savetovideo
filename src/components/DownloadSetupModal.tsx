@@ -53,14 +53,24 @@ export const DownloadSetupModal: React.FC<DownloadSetupModalProps> = ({
     });
   };
 
+  const [showPreview, setShowPreview] = useState(false);
+
+  const getYoutubeId = (url?: string): string | null => {
+    if (!url) return null;
+    const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i);
+    return m ? m[1] : null;
+  };
+
+  const ytId = getYoutubeId(stream.url) || (stream.title ? getYoutubeId(stream.title) : null);
+
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
       <div 
-        className="w-full max-w-xl bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-xl shadow-2xl overflow-hidden text-xs font-sans"
+        className="w-full max-w-xl bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-xl shadow-2xl overflow-hidden text-xs font-sans max-h-[90vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="bg-neutral-100 dark:bg-neutral-800 px-5 py-3.5 border-b border-neutral-200 dark:border-neutral-700 flex items-center justify-between">
+        <div className="bg-neutral-100 dark:bg-neutral-800 px-5 py-3.5 border-b border-neutral-200 dark:border-neutral-700 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-6 rounded bg-sky-600 text-white flex items-center justify-center font-bold text-[10px]">
               STV
@@ -83,20 +93,52 @@ export const DownloadSetupModal: React.FC<DownloadSetupModalProps> = ({
         </div>
 
         {/* Form Body */}
-        <div className="p-5 space-y-4">
+        <div className="p-5 space-y-4 overflow-y-auto flex-1">
+          {/* Optional Live Video Preview */}
+          {showPreview && (
+            <div className="rounded-xl overflow-hidden bg-black border border-neutral-300 dark:border-neutral-700 aspect-video max-h-56 flex items-center justify-center relative shadow-inner">
+              {ytId ? (
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1`}
+                  title={stream.title}
+                  className="w-full h-full border-0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media"
+                  allowFullScreen
+                />
+              ) : (
+                <video
+                  src={stream.url}
+                  controls
+                  autoPlay
+                  playsInline
+                  className="w-full h-full object-contain"
+                />
+              )}
+            </div>
+          )}
+
           {/* Target File Info Summary */}
           <div className="p-3 bg-neutral-50 dark:bg-neutral-800/60 rounded-lg border border-neutral-200 dark:border-neutral-800 flex justify-between items-center">
-            <div>
-              <div className="font-semibold text-neutral-900 dark:text-neutral-100 text-xs">
+            <div className="min-w-0 flex-1 mr-3">
+              <div className="font-semibold text-neutral-900 dark:text-neutral-100 text-xs truncate">
                 {stream.quality} · {stream.format} ({stream.codec})
               </div>
-              <div className="text-[11px] text-neutral-400 font-mono truncate max-w-md mt-0.5">
+              <div className="text-[11px] text-neutral-400 font-mono truncate mt-0.5" title={stream.url}>
                 {stream.url}
               </div>
             </div>
-            <span className="font-mono font-bold text-sky-600 dark:text-sky-400 text-sm tabular-nums">
-              {formatBytes(stream.sizeBytes)}
-            </span>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => setShowPreview(!showPreview)}
+                className="px-2.5 py-1 rounded bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 text-neutral-800 dark:text-neutral-200 text-[11px] font-medium transition-colors"
+              >
+                {showPreview ? 'Gizle' : 'Önizle'}
+              </button>
+              <span className="font-mono font-bold text-sky-600 dark:text-sky-400 text-sm tabular-nums">
+                {formatBytes(stream.sizeBytes)}
+              </span>
+            </div>
           </div>
 
           {/* File Name Input */}

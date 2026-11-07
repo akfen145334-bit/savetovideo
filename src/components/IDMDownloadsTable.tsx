@@ -251,8 +251,24 @@ export const IDMDownloadsTable: React.FC<IDMDownloadsTableProps> = ({
                     </td>
 
                     <td className="py-2.5 px-3">
-                      <div className="flex items-center gap-2 max-w-[280px] lg:max-w-md">
-                        {getFileIcon(item.category)}
+                      <div className="flex items-center gap-2.5 max-w-[280px] lg:max-w-md">
+                        {item.thumbnail ? (
+                          <div 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onWatchNow(item);
+                            }}
+                            className="w-11 h-8 rounded overflow-hidden bg-black shrink-0 relative group/thumb cursor-pointer border border-neutral-300 dark:border-neutral-700 shadow-2xs"
+                            title="Şimdi İzle"
+                          >
+                            <img src={item.thumbnail} alt="" className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/thumb:opacity-100 flex items-center justify-center transition-opacity">
+                              <Play className="w-3 h-3 text-white fill-current" />
+                            </div>
+                          </div>
+                        ) : (
+                          getFileIcon(item.category)
+                        )}
                         <div className="truncate min-w-0">
                           <div className="font-semibold text-neutral-900 dark:text-neutral-100 truncate" title={item.fileName}>
                             {item.fileName}

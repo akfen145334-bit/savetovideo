@@ -35,17 +35,74 @@ export const EmbeddedChromeBrowser: React.FC<EmbeddedChromeBrowserProps> = ({
 }) => {
   const initialTabs: WebPageTab[] = [
     {
+      id: 'tab-yt',
+      title: 'YouTube (Shadowing Speaking Challenge)',
+      url: 'https://www.youtube.com/watch?v=wCyyVuDIsrg',
+      videoSrc: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+      poster: 'https://i.ytimg.com/vi/wCyyVuDIsrg/hqdefault.jpg',
+      desc: 'English Learners Podcast: Shadowing English Speaking Practice | Speak Fluently 5-Day English Speaking Challenge. SaveToVideo, YouTube akışlarını otomatik yakaladı.',
+      streams: [
+        {
+          id: 'yt-1080p60',
+          url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+          title: 'Shadowing English Speaking Practice - 1080p 60fps Full HD',
+          format: 'MP4',
+          quality: '1080p (FHD)',
+          resolution: '1920x1080',
+          sizeBytes: 508559360,
+          sizeFormatted: '485 MB',
+          bitrate: '9.2 Mbps',
+          fps: 60,
+          codec: 'H.264 High@4.2 + AAC',
+          acceptRanges: true,
+          mimeType: 'video/mp4',
+          sourceType: 'Direct MP4',
+        },
+        {
+          id: 'yt-720p',
+          url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+          title: 'Shadowing English Speaking Practice - 720p HD',
+          format: 'MP4',
+          quality: '720p (HD)',
+          resolution: '1280x720',
+          sizeBytes: 241172480,
+          sizeFormatted: '230 MB',
+          bitrate: '4.1 Mbps',
+          fps: 30,
+          codec: 'H.264 / AAC',
+          acceptRanges: true,
+          mimeType: 'video/mp4',
+          sourceType: 'Direct MP4',
+        },
+        {
+          id: 'yt-audio',
+          url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+          title: 'Shadowing English Speaking Practice - Ses Parçası (320 kbps)',
+          format: 'M4A',
+          quality: 'Audio (320k)',
+          resolution: 'Audio Only',
+          sizeBytes: 39845888,
+          sizeFormatted: '38 MB',
+          bitrate: '320 kbps',
+          codec: 'AAC High Quality',
+          acceptRanges: true,
+          mimeType: 'audio/mp4',
+          sourceType: 'Audio Track',
+        }
+      ],
+    },
+    {
       id: 'tab-hdf',
-      title: 'The Dog Stars 2 (HDFilmCehennemi)',
+      title: 'The Dog Stars (HDFilmCehennemi 2026)',
       url: 'https://www.hdfilmcehennemi.nl/the-dog-stars-2/',
       videoSrc: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
-      poster: 'https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?auto=format&fit=crop&w=800&q=80',
-      desc: 'HDFilmCehennemi platformundaki The Dog Stars 2 filmi. SaveToVideo m3u8 adaptif akış ve 1080p Full HD video bağlantılarını anında tespit etmiştir.',
+      poster: 'https://images.unsplash.com/photo-1536240478700-b869070f9279?auto=format&fit=crop&w=800&q=80',
+      desc: 'The Dog Stars (Köpek ve Yıldızlar 2026) - Yönetmen: Ridley Scott · Başroller: Jacob Elordi, Josh Brolin. Cehennem Player 1080p Full HD Türkçe Dublaj.',
       streams: [
         {
           id: 'hdf-1080p',
           url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
-          title: 'The Dog Stars 2 - 1080p Full HD (Türkçe Dublaj & Altyazılı)',
+          title: 'The Dog Stars (2026) - 1080p Full HD (Türkçe Dublaj & Altyazılı)',
           format: 'MP4',
           quality: '1080p (FHD)',
           resolution: '1920x1080',
@@ -53,7 +110,7 @@ export const EmbeddedChromeBrowser: React.FC<EmbeddedChromeBrowserProps> = ({
           sizeFormatted: '1.98 GB',
           bitrate: '8.4 Mbps',
           fps: 60,
-          codec: 'H.264 / AAC 5.1',
+          codec: 'H.264 / AAC 5.1 Dual Dublaj',
           acceptRanges: true,
           mimeType: 'video/mp4',
           sourceType: 'Direct MP4',
@@ -61,7 +118,7 @@ export const EmbeddedChromeBrowser: React.FC<EmbeddedChromeBrowserProps> = ({
         {
           id: 'hdf-720p',
           url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
-          title: 'The Dog Stars 2 - 720p HD (Hızlı İndirme)',
+          title: 'The Dog Stars (2026) - 720p HD Hızlı İndirme',
           format: 'MP4',
           quality: '720p (HD)',
           resolution: '1280x720',
@@ -77,7 +134,7 @@ export const EmbeddedChromeBrowser: React.FC<EmbeddedChromeBrowserProps> = ({
         {
           id: 'hdf-m3u8',
           url: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
-          title: 'The Dog Stars 2 - HLS Master Playlist (.m3u8 Canlı Parça)',
+          title: 'The Dog Stars (2026) - HLS Master Playlist (.m3u8 Parçalı)',
           format: 'M3U8',
           quality: '1080p (FHD)',
           resolution: '1920x1080',
@@ -88,63 +145,6 @@ export const EmbeddedChromeBrowser: React.FC<EmbeddedChromeBrowserProps> = ({
           acceptRanges: true,
           mimeType: 'application/x-mpegURL',
           sourceType: 'HLS Stream',
-        }
-      ],
-    },
-    {
-      id: 'tab-yt',
-      title: 'YouTube (wCyyVuDIsrg)',
-      url: 'https://www.youtube.com/watch?v=wCyyVuDIsrg',
-      videoSrc: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-      poster: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80',
-      desc: 'YouTube video akışı: wCyyVuDIsrg. SaveToVideo, YouTube akışlarını 60fps 1080p, 720p ve ayrı ses kanalı olarak otomatik ayrıştırmıştır.',
-      streams: [
-        {
-          id: 'yt-1080p60',
-          url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-          title: 'YouTube wCyyVuDIsrg - 1080p 60fps Ultra Yüksek Kalite',
-          format: 'MP4',
-          quality: '1080p (FHD)',
-          resolution: '1920x1080',
-          sizeBytes: 508559360,
-          sizeFormatted: '485 MB',
-          bitrate: '9.2 Mbps',
-          fps: 60,
-          codec: 'H.264 High@4.2 + AAC',
-          acceptRanges: true,
-          mimeType: 'video/mp4',
-          sourceType: 'Direct MP4',
-        },
-        {
-          id: 'yt-720p',
-          url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-          title: 'YouTube wCyyVuDIsrg - 720p HD',
-          format: 'MP4',
-          quality: '720p (HD)',
-          resolution: '1280x720',
-          sizeBytes: 241172480,
-          sizeFormatted: '230 MB',
-          bitrate: '4.1 Mbps',
-          fps: 30,
-          codec: 'H.264 / AAC',
-          acceptRanges: true,
-          mimeType: 'video/mp4',
-          sourceType: 'Direct MP4',
-        },
-        {
-          id: 'yt-audio',
-          url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-          title: 'YouTube wCyyVuDIsrg - Ses Parçası (256 kbps M4A)',
-          format: 'M4A',
-          quality: 'Audio (320k)',
-          resolution: 'Audio Only',
-          sizeBytes: 39845888,
-          sizeFormatted: '38 MB',
-          bitrate: '256 kbps',
-          codec: 'AAC High Quality',
-          acceptRanges: true,
-          mimeType: 'audio/mp4',
-          sourceType: 'Audio Track',
         }
       ],
     },
@@ -490,7 +490,7 @@ export const EmbeddedChromeBrowser: React.FC<EmbeddedChromeBrowserProps> = ({
         </div>
 
         {/* Chrome Webpage Content Area with HTML5 Video */}
-        <div className="bg-neutral-900 relative min-h-[380px] flex flex-col justify-center items-center">
+        <div className="bg-neutral-900 relative min-h-[420px] flex flex-col justify-center items-center">
           {/* THE FAMOUS FLOATING VIDEO DOWNLOAD PANEL (Gömülü SaveToVideo Butonu) */}
           <div 
             onClick={handleSaveToVideoDownloadClick}
@@ -507,17 +507,52 @@ export const EmbeddedChromeBrowser: React.FC<EmbeddedChromeBrowserProps> = ({
             </span>
           </div>
 
-          {/* Real HTML5 Video Player */}
-          <video
-            ref={videoRef}
-            src={activeTab.videoSrc}
-            poster={activeTab.poster}
-            controls
-            playsInline
-            onPlay={() => setIsPlaying(true)}
-            onPause={() => setIsPlaying(false)}
-            className="w-full max-h-[460px] object-contain shadow-inner"
-          />
+          {/* HDFilmCehennemi Server Selector Bar */}
+          {activeTab.url.toLowerCase().includes('hdfilmcehennemi') && (
+            <div className="w-full bg-neutral-950 px-4 py-2 border-b border-neutral-800 flex flex-wrap items-center justify-between gap-2 z-10 text-xs">
+              <div className="flex items-center gap-1.5">
+                <span className="text-neutral-400 text-[11px]">Sunucu:</span>
+                <span className="px-2 py-0.5 rounded bg-sky-600 text-white font-medium text-[11px]">Cehennem Player (1080p FHD)</span>
+                <span className="px-2 py-0.5 rounded bg-neutral-800 text-neutral-300 hover:bg-neutral-700 cursor-pointer text-[11px]">VidMoly</span>
+                <span className="px-2 py-0.5 rounded bg-neutral-800 text-neutral-300 hover:bg-neutral-700 cursor-pointer text-[11px]">Rapidrame HLS</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="px-2 py-0.5 rounded bg-emerald-600/80 text-white text-[11px] font-medium">🇹🇷 Türkçe Dublaj</span>
+                <span className="px-2 py-0.5 rounded bg-neutral-800 text-neutral-300 text-[11px]">💬 Altyazılı</span>
+              </div>
+            </div>
+          )}
+
+          {/* Genuine YouTube Player or HTML5 Video Player */}
+          {(() => {
+            const ytMatch = activeTab.url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i);
+            const currentYtId = ytMatch ? ytMatch[1] : null;
+
+            if (currentYtId) {
+              return (
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${currentYtId}?autoplay=1&enablejsapi=1`}
+                  title={activeTab.title}
+                  className="w-full h-[460px] border-0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+              );
+            }
+
+            return (
+              <video
+                ref={videoRef}
+                src={activeTab.videoSrc}
+                poster={activeTab.poster}
+                controls
+                playsInline
+                onPlay={() => setIsPlaying(true)}
+                onPause={() => setIsPlaying(false)}
+                className="w-full max-h-[460px] object-contain shadow-inner"
+              />
+            );
+          })()}
         </div>
 
         {/* Video Metadata & Description Bar */}

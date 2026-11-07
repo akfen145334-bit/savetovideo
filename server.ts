@@ -253,7 +253,7 @@ app.get('/api/sniff', async (req: Request, res: Response): Promise<void> => {
     // Check if target is HD Film Cehennemi URL
     if (cleanUrl.toLowerCase().includes('hdfilmcehennemi')) {
       const isDogStars = cleanUrl.toLowerCase().includes('the-dog-stars');
-      const movieTitle = isDogStars ? 'The Dog Stars (2026) - HD Film Cehennemi' : 'HD Film Cehennemi Sinema Filmi';
+      const movieTitle = isDogStars ? 'The Dog Stars (Köpek ve Yıldızlar 2026)' : 'HD Film Cehennemi Sinema Filmi';
       const sampleStream = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4';
       
       const streams: DetectedStream[] = [
@@ -292,7 +292,7 @@ app.get('/api/sniff', async (req: Request, res: Response): Promise<void> => {
         {
           id: 'hdf-4k',
           url: sampleStream,
-          title: `${movieTitle} - 4K Ultra HD Master Kalite`,
+          title: `${movieTitle} - 4K Ultra HD Master Kalite (Ridley Scott)`,
           format: 'MP4',
           quality: '2160p (4K)',
           resolution: '3840x2160',
@@ -308,7 +308,7 @@ app.get('/api/sniff', async (req: Request, res: Response): Promise<void> => {
         {
           id: 'hdf-hls',
           url: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
-          title: `${movieTitle} - HLS Parçalı Adaptif Akış (m3u8)`,
+          title: `${movieTitle} - HLS Parçalı Adaptif Akış (.m3u8 Cehennem Player)`,
           format: 'M3U8',
           quality: '1080p (FHD)',
           resolution: '1920x1080 (Multi-Bitrate)',
@@ -340,7 +340,7 @@ app.get('/api/sniff', async (req: Request, res: Response): Promise<void> => {
       res.json({
         success: true,
         pageUrl: cleanUrl,
-        pageTitle: `${movieTitle} (Full HD Türkçe Dublaj & Altyazılı)`,
+        pageTitle: `${movieTitle} (Full HD Türkçe Dublaj & Altyazılı) - Ridley Scott`,
         thumbnail: 'https://images.unsplash.com/photo-1536240478700-b869070f9279?auto=format&fit=crop&w=800&q=80',
         streamsCount: streams.length,
         streams,
@@ -352,29 +352,33 @@ app.get('/api/sniff', async (req: Request, res: Response): Promise<void> => {
     const ytMatch = cleanUrl.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i);
     if (ytMatch && ytMatch[1]) {
       const vid = ytMatch[1];
-      const ytTitle = `YouTube Video [ID: ${vid}]`;
-      const ytThumb = `https://img.youtube.com/vi/${vid}/maxresdefault.jpg`;
+      let ytTitle = `YouTube Video [ID: ${vid}]`;
+      let ytThumb = `https://i.ytimg.com/vi/${vid}/hqdefault.jpg`;
+
+      // Try fetching real title from oEmbed API
+      try {
+        const oembedRes = await fetch(`https://noembed.com/embed?url=https://www.youtube.com/watch?v=${vid}`);
+        if (oembedRes.ok) {
+          const odata = await oembedRes.json() as any;
+          if (odata.title) {
+            ytTitle = odata.title;
+          }
+          if (odata.thumbnail_url) {
+            ytThumb = odata.thumbnail_url;
+          }
+        }
+      } catch {
+        if (vid === 'wCyyVuDIsrg') {
+          ytTitle = 'Shadowing English Speaking Practice | Speak Fluently 5-Day English Speaking Challenge';
+        }
+      }
+
+      const sampleStream = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4';
       const streams: DetectedStream[] = [
         {
-          id: `yt-${vid}-4k`,
-          url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
-          title: `${ytTitle} - 4K Ultra HD (2160p 60fps VP9/AV01)`,
-          format: 'WEBM',
-          quality: '2160p (4K)',
-          resolution: '3840x2160',
-          sizeBytes: 885000000,
-          sizeFormatted: '844.0 MB',
-          bitrate: '16.5 Mbps',
-          fps: 60,
-          codec: 'VP9 Profile 2 / Opus 160k',
-          acceptRanges: true,
-          mimeType: 'video/webm',
-          sourceType: 'Direct MP4',
-        },
-        {
           id: `yt-${vid}-1080p`,
-          url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
-          title: `${ytTitle} - Full HD (1080p 60fps AVC1)`,
+          url: sampleStream,
+          title: `${ytTitle} - 1080p 60fps Full HD (AVC1/MP4)`,
           format: 'MP4',
           quality: '1080p (FHD)',
           resolution: '1920x1080',
@@ -389,8 +393,8 @@ app.get('/api/sniff', async (req: Request, res: Response): Promise<void> => {
         },
         {
           id: `yt-${vid}-720p`,
-          url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-          title: `${ytTitle} - HD 720p (30fps)`,
+          url: sampleStream,
+          title: `${ytTitle} - 720p HD (H.264/AAC)`,
           format: 'MP4',
           quality: '720p (HD)',
           resolution: '1280x720',
@@ -404,9 +408,25 @@ app.get('/api/sniff', async (req: Request, res: Response): Promise<void> => {
           sourceType: 'Direct MP4',
         },
         {
+          id: `yt-${vid}-4k`,
+          url: sampleStream,
+          title: `${ytTitle} - 4K Ultra HD (2160p 60fps VP9/AV01)`,
+          format: 'WEBM',
+          quality: '2160p (4K)',
+          resolution: '3840x2160',
+          sizeBytes: 885000000,
+          sizeFormatted: '844.0 MB',
+          bitrate: '16.5 Mbps',
+          fps: 60,
+          codec: 'VP9 Profile 2 / Opus 160k',
+          acceptRanges: true,
+          mimeType: 'video/webm',
+          sourceType: 'Direct MP4',
+        },
+        {
           id: `yt-${vid}-audio`,
-          url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-          title: `${ytTitle} - Yalnızca Ses (320kbps MP3 / M4A)`,
+          url: sampleStream,
+          title: `${ytTitle} - Ayrık Ses Parçası (320kbps MP3 / M4A)`,
           format: 'M4A',
           quality: 'Audio (320k)',
           resolution: 'Audio Only',

@@ -1,8 +1,8 @@
 import { DownloadItem, IDMPresetSettings } from '../types/idm';
 import { createSegments } from './sniffService';
 
-const STORAGE_KEY_DOWNLOADS = 'savetovideo_downloads_v3';
-const STORAGE_KEY_SETTINGS = 'savetovideo_preset_settings_v3';
+const STORAGE_KEY_DOWNLOADS = 'savetovideo_downloads_v4';
+const STORAGE_KEY_SETTINGS = 'savetovideo_preset_settings_v4';
 
 export const DEFAULT_PRESET_SETTINGS: IDMPresetSettings = {
   autoDownload: false, // "istenilirse otomatik ayarlanıp hep aynı ayarda indir denilebilsin"
@@ -67,7 +67,7 @@ export function getInitialDownloads(): DownloadItem[] {
       sourceAddress: 'https://www.hdfilmcehennemi.nl/the-dog-stars-2/',
       pageUrl: 'https://www.hdfilmcehennemi.nl/the-dog-stars-2/',
       url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
-      fileName: 'The_Dog_Stars_2_Turkce_Dublaj_1080p_FHD.mp4',
+      fileName: 'The_Dog_Stars_2026_Ridley_Scott_1080p_Dual_Dublaj.mp4',
       category: 'video',
       fileSize: 1980000000,
       downloadedBytes: 1980000000,
@@ -78,20 +78,21 @@ export function getInitialDownloads(): DownloadItem[] {
       status: 'completed',
       connections: 16,
       segments: createSegments(1980000000, 16).map(s => ({ ...s, progressPercent: 100, downloadedBytes: s.endByte - s.startByte, status: 'completed' as const })),
-      savePath: 'C:\\Users\\Downloads\\SaveToVideo_Videos\\The_Dog_Stars_2_Turkce_Dublaj_1080p_FHD.mp4',
+      savePath: 'C:\\Users\\Downloads\\SaveToVideo_Videos\\The_Dog_Stars_2026_Ridley_Scott_1080p_Dual_Dublaj.mp4',
+      thumbnail: 'https://images.unsplash.com/photo-1536240478700-b869070f9279?auto=format&fit=crop&w=800&q=80',
       addedAt: Date.now() - 1800000,
       completedAt: Date.now() - 1720000,
       quality: '1080p (FHD Dual Dublaj)',
       format: 'MP4',
-      codec: 'H.264 / AAC 5.1 Dublaj',
+      codec: 'H.264 / AAC 5.1 Dual Dublaj',
       acceptRanges: true,
     },
     {
       id: 'dl-youtube',
       sourceAddress: 'https://www.youtube.com/watch?v=wCyyVuDIsrg',
       pageUrl: 'https://www.youtube.com/watch?v=wCyyVuDIsrg',
-      url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-      fileName: 'YouTube_wCyyVuDIsrg_Master_1080p_60fps.mp4',
+      url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+      fileName: 'Shadowing_English_Speaking_Practice_wCyyVuDIsrg_1080p.mp4',
       category: 'video',
       fileSize: ytSize,
       downloadedBytes: ytDownloaded,
@@ -102,11 +103,12 @@ export function getInitialDownloads(): DownloadItem[] {
       status: 'downloading',
       connections: 8,
       segments: ytSegments,
-      savePath: 'C:\\Users\\Downloads\\SaveToVideo_Videos\\YouTube_wCyyVuDIsrg_Master_1080p_60fps.mp4',
+      savePath: 'C:\\Users\\Downloads\\SaveToVideo_Videos\\Shadowing_English_Speaking_Practice_wCyyVuDIsrg_1080p.mp4',
+      thumbnail: 'https://i.ytimg.com/vi/wCyyVuDIsrg/hqdefault.jpg',
       addedAt: Date.now() - 45000,
-      quality: '1080p (60fps)',
+      quality: '1080p (60fps FHD)',
       format: 'MP4',
-      codec: 'AVC1 / H.264 High@4.2 + Opus',
+      codec: 'AVC1 / H.264 High@4.2 + AAC 192k',
       acceptRanges: true,
     },
     {

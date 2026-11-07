@@ -90,25 +90,45 @@ export const VideoPlayerModal: React.FC<VideoPlayerModalProps> = ({
     ? new URL(item.sourceAddress || item.pageUrl!).hostname 
     : 'Doğrudan Akış';
 
+  const getYoutubeId = (url?: string): string | null => {
+    if (!url) return null;
+    const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i);
+    return m ? m[1] : null;
+  };
+
+  const ytId = getYoutubeId(item.sourceAddress) || getYoutubeId(item.pageUrl) || getYoutubeId(item.url);
+
   // If PiP mini-player mode is active
   if (isPip) {
     return (
-      <div className="fixed bottom-4 right-4 z-50 w-84 bg-neutral-900 border border-neutral-700 rounded-xl shadow-2xl overflow-hidden font-sans">
+      <div className="fixed bottom-4 right-4 z-50 w-88 bg-neutral-900 border border-neutral-700 rounded-xl shadow-2xl overflow-hidden font-sans">
         <div className="relative group bg-black aspect-video flex items-center justify-center">
-          <video
-            ref={videoRef}
-            src={item.url}
-            autoPlay
-            playsInline
-            onTimeUpdate={(e) => setCurrentTime((e.target as HTMLVideoElement).currentTime)}
-            onLoadedMetadata={(e) => setDuration((e.target as HTMLVideoElement).duration)}
-            className="w-full h-full object-contain"
-          />
-          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-            <button onClick={togglePlay} className="p-2 rounded-full bg-white/20 hover:bg-white/30 text-white">
-              {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 fill-current" />}
-            </button>
-          </div>
+          {ytId ? (
+            <iframe
+              src={`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&enablejsapi=1`}
+              title={item.fileName}
+              className="w-full h-full border-0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          ) : (
+            <>
+              <video
+                ref={videoRef}
+                src={item.url}
+                autoPlay
+                playsInline
+                onTimeUpdate={(e) => setCurrentTime((e.target as HTMLVideoElement).currentTime)}
+                onLoadedMetadata={(e) => setDuration((e.target as HTMLVideoElement).duration)}
+                className="w-full h-full object-contain"
+              />
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                <button onClick={togglePlay} className="p-2 rounded-full bg-white/20 hover:bg-white/30 text-white">
+                  {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 fill-current" />}
+                </button>
+              </div>
+            </>
+          )}
           <button
             onClick={() => setIsPip(false)}
             title="Genişlet"
@@ -188,18 +208,28 @@ export const VideoPlayerModal: React.FC<VideoPlayerModalProps> = ({
 
         {/* Video Player Display Area */}
         <div className="relative bg-black flex-1 min-h-[380px] max-h-[520px] flex items-center justify-center overflow-hidden group">
-          <video
-            ref={videoRef}
-            src={item.url}
-            autoPlay
-            playsInline
-            controls
-            onPlay={() => setIsPlaying(true)}
-            onPause={() => setIsPlaying(false)}
-            onTimeUpdate={(e) => setCurrentTime((e.target as HTMLVideoElement).currentTime)}
-            onLoadedMetadata={(e) => setDuration((e.target as HTMLVideoElement).duration)}
-            className="w-full h-full max-h-[520px] object-contain shadow-2xl"
-          />
+          {ytId ? (
+            <iframe
+              src={`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&enablejsapi=1`}
+              title={item.fileName}
+              className="w-full h-full min-h-[420px] max-h-[520px] border-0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            />
+          ) : (
+            <video
+              ref={videoRef}
+              src={item.url}
+              autoPlay
+              playsInline
+              controls
+              onPlay={() => setIsPlaying(true)}
+              onPause={() => setIsPlaying(false)}
+              onTimeUpdate={(e) => setCurrentTime((e.target as HTMLVideoElement).currentTime)}
+              onLoadedMetadata={(e) => setDuration((e.target as HTMLVideoElement).duration)}
+              className="w-full h-full max-h-[520px] object-contain shadow-2xl"
+            />
+          )}
 
           {/* Floating live download synchronization pill */}
           {item.status === 'downloading' && (

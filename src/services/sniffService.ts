@@ -79,13 +79,13 @@ export function getSimulatedSniffResult(inputUrl: string): SniffResult {
   // 1. HD Film Cehennemi Detection
   if (lower.includes('hdfilmcehennemi')) {
     const isDogStars = lower.includes('the-dog-stars');
-    const movieTitle = isDogStars ? 'The Dog Stars (2026) - HD Film Cehennemi' : 'HD Film Cehennemi Sinema Filmi';
+    const movieTitle = isDogStars ? 'The Dog Stars (Köpek ve Yıldızlar 2026)' : 'HD Film Cehennemi Sinema Filmi';
     const sampleStream = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4';
     
     return {
       success: true,
       pageUrl: inputUrl,
-      pageTitle: `${movieTitle} (Full HD Türkçe Dublaj & Altyazılı)`,
+      pageTitle: `${movieTitle} (Full HD Türkçe Dublaj & Altyazılı) - Ridley Scott`,
       thumbnail: 'https://images.unsplash.com/photo-1536240478700-b869070f9279?auto=format&fit=crop&w=800&q=80',
       streamsCount: 5,
       streams: [
@@ -124,7 +124,7 @@ export function getSimulatedSniffResult(inputUrl: string): SniffResult {
         {
           id: `hdf-4k`,
           url: sampleStream,
-          title: `${movieTitle} - 4K Ultra HD Master Kalite`,
+          title: `${movieTitle} - 4K Ultra HD Master Kalite (Ridley Scott)`,
           format: 'MP4',
           quality: '2160p (4K)',
           resolution: '3840x2160',
@@ -140,7 +140,7 @@ export function getSimulatedSniffResult(inputUrl: string): SniffResult {
         {
           id: `hdf-hls`,
           url: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
-          title: `${movieTitle} - HLS Parçalı Adaptif Akış (m3u8)`,
+          title: `${movieTitle} - HLS Parçalı Adaptif Akış (.m3u8 Cehennem Player)`,
           format: 'M3U8',
           quality: '1080p (FHD)',
           resolution: '1920x1080 (Multi-Bitrate)',
@@ -175,16 +175,50 @@ export function getSimulatedSniffResult(inputUrl: string): SniffResult {
   const ytMatch = inputUrl.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i);
   if (ytMatch && ytMatch[1]) {
     const vid = ytMatch[1];
-    const ytTitle = `YouTube Video [ID: ${vid}]`;
-    const sampleYt = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
+    let ytTitle = vid === 'wCyyVuDIsrg' 
+      ? 'Shadowing English Speaking Practice | Speak Fluently 5-Day English Speaking Challenge' 
+      : `YouTube Video [ID: ${vid}]`;
+    const sampleYt = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4';
 
     return {
       success: true,
       pageUrl: inputUrl,
       pageTitle: ytTitle,
-      thumbnail: `https://img.youtube.com/vi/${vid}/maxresdefault.jpg`,
+      thumbnail: `https://i.ytimg.com/vi/${vid}/hqdefault.jpg`,
       streamsCount: 4,
       streams: [
+        {
+          id: `yt-${vid}-1080p`,
+          url: sampleYt,
+          title: `${ytTitle} - 1080p 60fps Full HD (AVC1/MP4)`,
+          format: 'MP4',
+          quality: '1080p (FHD)',
+          resolution: '1920x1080',
+          sizeBytes: 312000000,
+          sizeFormatted: '297.5 MB',
+          bitrate: '5.8 Mbps',
+          fps: 60,
+          codec: 'H.264 High@4.2 + AAC 192k',
+          acceptRanges: true,
+          mimeType: 'video/mp4',
+          sourceType: 'Direct MP4',
+        },
+        {
+          id: `yt-${vid}-720p`,
+          url: sampleYt,
+          title: `${ytTitle} - 720p HD (H.264/AAC)`,
+          format: 'MP4',
+          quality: '720p (HD)',
+          resolution: '1280x720',
+          sizeBytes: 125000000,
+          sizeFormatted: '119.2 MB',
+          bitrate: '2.9 Mbps',
+          fps: 30,
+          codec: 'H.264 Main@3.1',
+          acceptRanges: true,
+          mimeType: 'video/mp4',
+          sourceType: 'Direct MP4',
+        },
         {
           id: `yt-${vid}-4k`,
           url: sampleYt,
@@ -202,41 +236,9 @@ export function getSimulatedSniffResult(inputUrl: string): SniffResult {
           sourceType: 'Direct MP4',
         },
         {
-          id: `yt-${vid}-1080p`,
-          url: sampleYt,
-          title: `${ytTitle} - Full HD (1080p 60fps AVC1)`,
-          format: 'MP4',
-          quality: '1080p (FHD)',
-          resolution: '1920x1080',
-          sizeBytes: 312000000,
-          sizeFormatted: '297.5 MB',
-          bitrate: '5.8 Mbps',
-          fps: 60,
-          codec: 'H.264 High@4.2 + AAC 192k',
-          acceptRanges: true,
-          mimeType: 'video/mp4',
-          sourceType: 'Direct MP4',
-        },
-        {
-          id: `yt-${vid}-720p`,
-          url: sampleYt,
-          title: `${ytTitle} - HD 720p (30fps)`,
-          format: 'MP4',
-          quality: '720p (HD)',
-          resolution: '1280x720',
-          sizeBytes: 125000000,
-          sizeFormatted: '119.2 MB',
-          bitrate: '2.9 Mbps',
-          fps: 30,
-          codec: 'H.264 Main@3.1',
-          acceptRanges: true,
-          mimeType: 'video/mp4',
-          sourceType: 'Direct MP4',
-        },
-        {
           id: `yt-${vid}-audio`,
           url: sampleYt,
-          title: `${ytTitle} - Yalnızca Ses (320kbps MP3 / M4A)`,
+          title: `${ytTitle} - Ayrık Ses Parçası (320kbps MP3 / M4A)`,
           format: 'M4A',
           quality: 'Audio (320k)',
           resolution: 'Audio Only',

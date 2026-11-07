@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   X, 
   Video, 
   Music, 
   Download, 
   CheckCircle2, 
-  Layers
+  Layers,
+  Play,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { DetectedStream, SniffResult } from '../types/idm';
 
@@ -22,14 +25,24 @@ export const StreamPickerModal: React.FC<StreamPickerModalProps> = ({
 }) => {
   if (!sniffResult) return null;
 
+  const [showLivePreview, setShowLivePreview] = useState(true);
+
+  const getYoutubeId = (url?: string): string | null => {
+    if (!url) return null;
+    const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i);
+    return m ? m[1] : null;
+  };
+
+  const ytId = getYoutubeId(sniffResult.pageUrl) || (sniffResult.streams[0] ? getYoutubeId(sniffResult.streams[0].url) : null);
+
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
       <div 
-        className="w-full max-w-2xl bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-xl shadow-2xl overflow-hidden text-xs font-sans"
+        className="w-full max-w-2xl bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-xl shadow-2xl overflow-hidden text-xs font-sans max-h-[90vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="bg-neutral-100 dark:bg-neutral-800 px-5 py-3.5 border-b border-neutral-200 dark:border-neutral-700 flex items-center justify-between">
+        <div className="bg-neutral-100 dark:bg-neutral-800 px-5 py-3.5 border-b border-neutral-200 dark:border-neutral-700 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-6 rounded bg-sky-600 text-white flex items-center justify-center font-bold text-[10px]">
               STV
@@ -51,36 +64,69 @@ export const StreamPickerModal: React.FC<StreamPickerModalProps> = ({
           </button>
         </div>
 
-        {/* Media Preview Card */}
-        <div className="p-5 space-y-4">
-          <div className="flex items-start gap-3.5 p-3 bg-neutral-50 dark:bg-neutral-800/60 rounded-lg border border-neutral-200/80 dark:border-neutral-800">
-            <div className="w-24 h-16 rounded overflow-hidden bg-neutral-900 shrink-0 relative">
-              <img
-                src={sniffResult.thumbnail}
-                alt={sniffResult.pageTitle}
-                referrerPolicy="no-referrer"
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none';
-                }}
-              />
-              <div className="absolute inset-0 flex items-center justify-center text-white/70 bg-black/30">
-                <Video className="w-5 h-5" />
+        {/* Media Preview Card & Streams Scroll Area */}
+        <div className="p-5 space-y-4 overflow-y-auto flex-1">
+          {/* Active Live Video Player Preview (İndirme Sayfasında Canlı Video İzleme) */}
+          {showLivePreview && (
+            <div className="rounded-xl overflow-hidden bg-black border border-neutral-300 dark:border-neutral-700 aspect-video max-h-64 flex items-center justify-center relative shadow-md">
+              {ytId ? (
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1`}
+                  title={sniffResult.pageTitle}
+                  className="w-full h-full border-0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              ) : (
+                <video
+                  src={sniffResult.streams[0]?.url || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4'}
+                  controls
+                  autoPlay
+                  playsInline
+                  className="w-full h-full object-contain"
+                />
+              )}
+            </div>
+          )}
+
+          <div className="flex items-start justify-between gap-3.5 p-3 bg-neutral-50 dark:bg-neutral-800/60 rounded-lg border border-neutral-200/80 dark:border-neutral-800">
+            <div className="flex items-start gap-3 min-w-0">
+              <div className="w-20 h-14 rounded overflow-hidden bg-neutral-900 shrink-0 relative">
+                <img
+                  src={sniffResult.thumbnail}
+                  alt={sniffResult.pageTitle}
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
+                />
+                <div className="absolute inset-0 flex items-center justify-center text-white/70 bg-black/30">
+                  <Video className="w-4 h-4" />
+                </div>
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <h4 className="font-semibold text-neutral-900 dark:text-neutral-100 text-sm truncate" title={sniffResult.pageTitle}>
+                  {sniffResult.pageTitle}
+                </h4>
+                <p className="text-[11px] text-neutral-400 font-mono truncate mt-0.5" title={sniffResult.pageUrl}>
+                  {sniffResult.pageUrl}
+                </p>
+                <div className="flex items-center gap-2 mt-1.5 text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>Derin Medya Taraması Başarıyla Tamamlandı</span>
+                </div>
               </div>
             </div>
 
-            <div className="flex-1 min-w-0">
-              <h4 className="font-semibold text-neutral-900 dark:text-neutral-100 text-sm truncate" title={sniffResult.pageTitle}>
-                {sniffResult.pageTitle}
-              </h4>
-              <p className="text-[11px] text-neutral-400 font-mono truncate mt-0.5" title={sniffResult.pageUrl}>
-                {sniffResult.pageUrl}
-              </p>
-              <div className="flex items-center gap-2 mt-2 text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                <span>Derin Medya Taraması Başarıyla Tamamlandı</span>
-              </div>
-            </div>
+            <button
+              onClick={() => setShowLivePreview(!showLivePreview)}
+              className="px-2.5 py-1 rounded bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 text-neutral-700 dark:text-neutral-200 font-medium text-[11px] shrink-0 flex items-center gap-1 transition-colors"
+            >
+              {showLivePreview ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+              <span>{showLivePreview ? 'Videoyu Gizle' : 'Videoyu Oynat'}</span>
+            </button>
           </div>
 
           {/* Streams List */}

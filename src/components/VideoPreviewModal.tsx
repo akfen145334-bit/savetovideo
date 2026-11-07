@@ -18,6 +18,14 @@ export const VideoPreviewModal: React.FC<VideoPreviewModalProps> = ({
 
   const isAudio = item.category === 'music' || item.fileName.endsWith('.mp3') || item.fileName.endsWith('.m4a');
 
+  const getYoutubeId = (url?: string): string | null => {
+    if (!url) return null;
+    const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i);
+    return m ? m[1] : null;
+  };
+
+  const ytId = getYoutubeId(item.sourceAddress) || getYoutubeId(item.pageUrl) || getYoutubeId(item.url);
+
   return (
     <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4">
       <div 
@@ -41,7 +49,7 @@ export const VideoPreviewModal: React.FC<VideoPreviewModalProps> = ({
         </div>
 
         {/* Media Player Area */}
-        <div className="bg-black relative min-h-[320px] flex items-center justify-center p-2">
+        <div className="bg-black relative min-h-[340px] flex items-center justify-center p-2">
           {isAudio ? (
             <div className="w-full max-w-md p-6 bg-neutral-800 rounded-xl flex flex-col items-center gap-4">
               <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl font-bold">
@@ -53,6 +61,14 @@ export const VideoPreviewModal: React.FC<VideoPreviewModalProps> = ({
               </div>
               <audio src={item.url} controls className="w-full mt-2" autoPlay />
             </div>
+          ) : ytId ? (
+            <iframe
+              src={`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&enablejsapi=1`}
+              title={item.fileName}
+              className="w-full h-[400px] border-0 rounded"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
           ) : (
             <video
               src={item.url}

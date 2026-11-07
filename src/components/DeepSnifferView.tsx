@@ -220,6 +220,36 @@ export const DeepSnifferView: React.FC<DeepSnifferViewProps> = ({
             </div>
           </div>
 
+          {/* Live Video Preview Box (İndirme ve Arama Sayfasında Video Önizleme) */}
+          <div className="rounded-xl overflow-hidden bg-black border border-neutral-200 dark:border-neutral-800 aspect-video max-h-72 flex items-center justify-center relative shadow-sm">
+            {(() => {
+              const ytMatch = result.pageUrl.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i);
+              const ytId = ytMatch ? ytMatch[1] : null;
+
+              if (ytId) {
+                return (
+                  <iframe
+                    src={`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=0`}
+                    title={result.pageTitle}
+                    className="w-full h-full border-0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                );
+              }
+
+              return (
+                <video
+                  src={result.streams[0]?.url || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4'}
+                  poster={result.thumbnail}
+                  controls
+                  playsInline
+                  className="w-full h-full object-contain"
+                />
+              );
+            })()}
+          </div>
+
           {/* Results Table */}
           <div className="divide-y divide-neutral-100 dark:divide-neutral-800 border border-neutral-200 dark:border-neutral-800 rounded-lg overflow-hidden">
             {result.streams.map((stream) => {
