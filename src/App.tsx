@@ -458,12 +458,18 @@ export default function App() {
     savePath,
     connections,
     startImmediately,
+    sourceAddress,
+    pageUrl,
+    thumbnail,
   }: {
     stream: DetectedStream;
     fileName: string;
     savePath: string;
     connections: number;
     startImmediately: boolean;
+    sourceAddress?: string;
+    pageUrl?: string;
+    thumbnail?: string;
   }) => {
     const isAudio = stream.quality.includes('Audio') || stream.format === 'MP3' || stream.format === 'M4A';
     const category: DownloadItem['category'] = isAudio ? 'music' : 'video';
@@ -490,10 +496,36 @@ export default function App() {
       format: stream.format,
       codec: stream.codec,
       acceptRanges: stream.acceptRanges,
+      sourceAddress: sourceAddress || pageUrl,
+      pageUrl,
+      thumbnail,
     };
 
     setDownloads(prev => [newItem, ...prev]);
     setSelectedIds([newItem.id]);
+  };
+
+  const handleDirectDownloadFromBrowser = (
+    stream: DetectedStream, 
+    pageTitle: string, 
+    pageUrl: string,
+    thumbnail?: string
+  ) => {
+    const defaultExt = stream.format.toLowerCase();
+    const cleanTitle = (stream.title || pageTitle || 'video').replace(/[/\\?%*:|"<>]/g, '_');
+    const fileName = `${cleanTitle}.${defaultExt}`;
+    
+    startNewDownload({
+      stream,
+      fileName,
+      savePath: settings.defaultSavePath,
+      connections: settings.defaultConnections || 8,
+      startImmediately: true,
+      sourceAddress: pageUrl,
+      pageUrl,
+      thumbnail: thumbnail || 'https://images.unsplash.com/photo-1536240478700-b869070f9279?auto=format&fit=crop&w=800&q=80',
+    });
+    showToast(`"${fileName}" dahili tarayıcıdan indirilmeye başlandı!`);
   };
 
   // Export / Import downloads list
@@ -645,16 +677,22 @@ export default function App() {
 
       {activeTab === 'chrome_browser' && (
         <EmbeddedChromeBrowser
-          onTriggerSnifferModal={(streams, pageTitle, pageUrl) => {
+          onTriggerSnifferModal={(streams, pageTitle, pageUrl, thumbnail) => {
             setActiveSniffResult({
               success: true,
               pageTitle,
               pageUrl,
-              thumbnail: 'https://images.unsplash.com/photo-1536240478700-b869070f9279?auto=format&fit=crop&w=800&q=80',
+              thumbnail: thumbnail || 'https://images.unsplash.com/photo-1536240478700-b869070f9279?auto=format&fit=crop&w=800&q=80',
               streamsCount: streams.length,
               streams,
             });
           }}
+          onDirectDownload={handleDirectDownloadFromBrowser}
+          onWatchNow={(item) => setWatchNowItem(item)}
+          onShowInFolder={(item) => setFolderItem(item)}
+          onNavigateToDownloads={() => setActiveTab('downloads')}
+          onTogglePause={handleTogglePause}
+          activeDownloads={downloads}
         />
       )}
 

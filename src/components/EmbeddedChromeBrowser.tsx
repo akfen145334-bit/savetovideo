@@ -3,21 +3,38 @@ import {
   ArrowLeft, 
   ArrowRight, 
   RotateCw, 
+  Home,
   Lock, 
-  Puzzle, 
   Download, 
-  Layers, 
   Terminal,
   Activity,
   Plus,
+  X,
   Search,
-  ExternalLink
+  ExternalLink,
+  Zap,
+  Play,
+  Folder,
+  CheckCircle2,
+  List,
+  Film,
+  Sparkles,
+  ChevronDown,
+  Globe,
+  Pause,
+  PlayCircle
 } from 'lucide-react';
-import { DetectedStream } from '../types/idm';
+import { DetectedStream, DownloadItem } from '../types/idm';
 import { sniffVideoMedia } from '../services/sniffService';
 
-interface EmbeddedChromeBrowserProps {
-  onTriggerSnifferModal: (streams: DetectedStream[], pageTitle: string, pageUrl: string) => void;
+export interface EmbeddedChromeBrowserProps {
+  onTriggerSnifferModal: (streams: DetectedStream[], pageTitle: string, pageUrl: string, thumbnail?: string) => void;
+  onDirectDownload: (stream: DetectedStream, pageTitle: string, pageUrl: string, thumbnail?: string) => void;
+  onWatchNow?: (item: DownloadItem) => void;
+  onShowInFolder?: (item: DownloadItem) => void;
+  onNavigateToDownloads?: () => void;
+  onTogglePause?: (id: string) => void;
+  activeDownloads?: DownloadItem[];
 }
 
 interface WebPageTab {
@@ -28,10 +45,50 @@ interface WebPageTab {
   poster: string;
   desc: string;
   streams: DetectedStream[];
+  isHome?: boolean;
 }
+
+const DEFAULT_BOOKMARKS = [
+  {
+    name: 'The Dog Stars (HDFilmCehennemi)',
+    url: 'https://www.hdfilmcehennemi.nl/the-dog-stars-2/',
+    icon: '🎬',
+    badge: '1080p FHD'
+  },
+  {
+    name: 'YouTube (Speaking Challenge)',
+    url: 'https://www.youtube.com/watch?v=wCyyVuDIsrg',
+    icon: '📺',
+    badge: 'YouTube'
+  },
+  {
+    name: 'Tears of Steel (4K Cinema)',
+    url: 'https://cinema-stream.org/watch/tears-of-steel',
+    icon: '🚀',
+    badge: '4K Ultra'
+  },
+  {
+    name: 'Big Buck Bunny (HD)',
+    url: 'https://animation-portal.com/watch/big-buck-bunny',
+    icon: '🐰',
+    badge: 'Animasyon'
+  },
+  {
+    name: 'Mux HLS Canlı Akış',
+    url: 'https://live-broadcasting.tv/stream/mux-adaptive',
+    icon: '📡',
+    badge: '.m3u8'
+  }
+];
 
 export const EmbeddedChromeBrowser: React.FC<EmbeddedChromeBrowserProps> = ({
   onTriggerSnifferModal,
+  onDirectDownload,
+  onWatchNow,
+  onShowInFolder,
+  onNavigateToDownloads,
+  onTogglePause,
+  activeDownloads = [],
 }) => {
   const initialTabs: WebPageTab[] = [
     {
@@ -149,7 +206,7 @@ export const EmbeddedChromeBrowser: React.FC<EmbeddedChromeBrowserProps> = ({
       ],
     },
     {
-      id: 'tab-1',
+      id: 'tab-tos',
       title: 'Tears of Steel (4K Sci-Fi Cinema)',
       url: 'https://cinema-stream.org/watch/tears-of-steel',
       videoSrc: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
@@ -187,105 +244,6 @@ export const EmbeddedChromeBrowser: React.FC<EmbeddedChromeBrowserProps> = ({
           acceptRanges: true,
           mimeType: 'video/mp4',
           sourceType: 'Direct MP4',
-        },
-        {
-          id: 'tos-720p',
-          url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
-          title: 'Tears of Steel - HD (720p)',
-          format: 'MP4',
-          quality: '720p (HD)',
-          resolution: '1280x720',
-          sizeBytes: 154000000,
-          sizeFormatted: '146.9 MB',
-          bitrate: '3.1 Mbps',
-          fps: 30,
-          codec: 'H.264 Main@3.1',
-          acceptRanges: true,
-          mimeType: 'video/mp4',
-          sourceType: 'Direct MP4',
-        },
-        {
-          id: 'tos-audio',
-          url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
-          title: 'Tears of Steel - Surround Ses Parçası (320k)',
-          format: 'M4A',
-          quality: 'Audio (320k)',
-          resolution: 'Audio Only',
-          sizeBytes: 24500000,
-          sizeFormatted: '23.4 MB',
-          bitrate: '320 kbps',
-          codec: 'AAC-LC High Fidelity',
-          acceptRanges: true,
-          mimeType: 'audio/mp4',
-          sourceType: 'Audio Track',
-        }
-      ],
-    },
-    {
-      id: 'tab-2',
-      title: 'Big Buck Bunny (HD Animation Hub)',
-      url: 'https://animation-portal.com/watch/big-buck-bunny',
-      videoSrc: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-      poster: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80',
-      desc: 'Blender Vakfı animasyon stüdyosu tarafından üretilen klasik 3D animasyon videosu.',
-      streams: [
-        {
-          id: 'bbb-1080p',
-          url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-          title: 'Big Buck Bunny - 1080p 60fps',
-          format: 'MP4',
-          quality: '1080p (FHD)',
-          resolution: '1920x1080',
-          sizeBytes: 158000000,
-          sizeFormatted: '150.7 MB',
-          bitrate: '5.8 Mbps',
-          fps: 60,
-          codec: 'H.264 / AAC',
-          acceptRanges: true,
-          mimeType: 'video/mp4',
-          sourceType: 'Direct MP4',
-        },
-        {
-          id: 'bbb-720p',
-          url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-          title: 'Big Buck Bunny - 720p HD',
-          format: 'MP4',
-          quality: '720p (HD)',
-          resolution: '1280x720',
-          sizeBytes: 94000000,
-          sizeFormatted: '89.6 MB',
-          bitrate: '2.8 Mbps',
-          fps: 30,
-          codec: 'H.264 / AAC',
-          acceptRanges: true,
-          mimeType: 'video/mp4',
-          sourceType: 'Direct MP4',
-        }
-      ],
-    },
-    {
-      id: 'tab-3',
-      title: 'Mux HLS Adaptive Live Stream',
-      url: 'https://live-broadcasting.tv/stream/mux-adaptive',
-      videoSrc: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-      poster: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80',
-      desc: 'Canlı HLS adaptif akış iletimi. SaveToVideo, .m3u8 manifestini ve tüm TS parçalarını anında yakalar.',
-      streams: [
-        {
-          id: 'mux-m3u8',
-          url: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
-          title: 'Mux HLS Canlı Akış - Adaptif Çoklu Bitrate (.m3u8)',
-          format: 'M3U8',
-          quality: '1080p (FHD)',
-          resolution: '1920x1080',
-          sizeBytes: 280000000,
-          sizeFormatted: '267.0 MB (TS Chunks)',
-          bitrate: 'Adaptif Akış',
-          fps: 30,
-          codec: 'Apple HTTP Live Streaming',
-          acceptRanges: true,
-          mimeType: 'application/x-mpegURL',
-          sourceType: 'HLS Stream',
         }
       ],
     }
@@ -299,37 +257,101 @@ export const EmbeddedChromeBrowser: React.FC<EmbeddedChromeBrowserProps> = ({
   const [historyIndex, setHistoryIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoadingPage, setIsLoadingPage] = useState(false);
-  const [showNetworkSniffer, setShowNetworkSniffer] = useState(true);
+  const [showNetworkSniffer, setShowNetworkSniffer] = useState(false);
+  const [showQualityDropdown, setShowQualityDropdown] = useState(false);
+  const [isDockMinimized, setIsDockMinimized] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Pick best stream (highest resolution)
+  const bestStream = activeTab.streams && activeTab.streams.length > 0 
+    ? activeTab.streams[0] 
+    : null;
 
   const handleTabSwitch = (t: WebPageTab) => {
     setActiveTabId(t.id);
     setUrlInput(t.url);
     setIsPlaying(false);
+    setShowQualityDropdown(false);
     setHistoryStack([t.url]);
     setHistoryIndex(0);
   };
 
-  const handleNavigateUrl = async (targetUrl: string) => {
-    if (!targetUrl.trim()) return;
+  const handleCloseTab = (e: React.MouseEvent, tabId: string) => {
+    e.stopPropagation();
+    if (tabs.length === 1) {
+      // If closing the only tab, open fresh home tab
+      handleOpenNewTab();
+      setTabs(prev => prev.filter(t => t.id !== tabId));
+      return;
+    }
+    const remainingTabs = tabs.filter(t => t.id !== tabId);
+    setTabs(remainingTabs);
+    if (activeTabId === tabId) {
+      const nextTab = remainingTabs[remainingTabs.length - 1];
+      setActiveTabId(nextTab.id);
+      setUrlInput(nextTab.url);
+    }
+  };
+
+  const handleOpenNewTab = (prefillUrl?: string) => {
+    const isBlank = !prefillUrl;
+    const newTab: WebPageTab = {
+      id: `tab-${Date.now()}`,
+      title: isBlank ? 'Yeni Sekme' : 'Yükleniyor...',
+      url: prefillUrl || 'stv://home',
+      videoSrc: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+      poster: 'https://images.unsplash.com/photo-1536240478700-b869070f9279?auto=format&fit=crop&w=800&q=80',
+      desc: isBlank ? 'SaveToVideo Hızlı Erişim ve Video Arama' : 'Sayfa yükleniyor...',
+      streams: [],
+      isHome: isBlank,
+    };
+
+    setTabs(prev => [...prev, newTab]);
+    setActiveTabId(newTab.id);
+    setUrlInput(prefillUrl || '');
+    if (prefillUrl) {
+      handleNavigateUrl(prefillUrl, newTab.id);
+    }
+  };
+
+  const handleNavigateUrl = async (targetUrl: string, targetTabId?: string) => {
+    let cleanUrl = targetUrl.trim();
+    if (!cleanUrl) return;
+
+    // Check if user entered search terms or domain
+    if (!cleanUrl.startsWith('http://') && !cleanUrl.startsWith('https://') && !cleanUrl.startsWith('stv://')) {
+      if (cleanUrl.includes('.') && !cleanUrl.includes(' ')) {
+        cleanUrl = `https://${cleanUrl}`;
+      } else {
+        // Query search
+        cleanUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(cleanUrl)}`;
+      }
+    }
+
+    setUrlInput(cleanUrl);
     setIsLoadingPage(true);
 
     try {
-      const sniffResult = await sniffVideoMedia(targetUrl);
-      const newTab: WebPageTab = {
-        id: `custom-tab-${Date.now()}`,
-        title: sniffResult.pageTitle || 'Özel Web Sayfası',
-        url: targetUrl,
-        videoSrc: sniffResult.streams[0]?.url || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-        poster: sniffResult.thumbnail || 'https://images.unsplash.com/photo-1536240478700-b869070f9279?auto=format&fit=crop&w=800&q=80',
-        desc: `SaveToVideo bu sayfada ${sniffResult.streamsCount} adet indirilebilir akış ve çözünürlük buldu.`,
-        streams: sniffResult.streams,
-      };
+      const sniffResult = await sniffVideoMedia(cleanUrl);
+      const tabToUpdate = targetTabId || activeTabId;
 
-      setTabs(prev => [...prev, newTab]);
-      setActiveTabId(newTab.id);
-      setUrlInput(newTab.url);
-      setHistoryStack(prev => [...prev.slice(0, historyIndex + 1), newTab.url]);
+      setTabs(prev => prev.map(t => {
+        if (t.id === tabToUpdate) {
+          return {
+            ...t,
+            title: sniffResult.pageTitle || 'Web Sayfası',
+            url: cleanUrl,
+            videoSrc: sniffResult.streams[0]?.url || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+            poster: sniffResult.thumbnail || 'https://images.unsplash.com/photo-1536240478700-b869070f9279?auto=format&fit=crop&w=800&q=80',
+            desc: `SaveToVideo bu sayfada ${sniffResult.streamsCount} adet indirilebilir akış ve çözünürlük buldu.`,
+            streams: sniffResult.streams,
+            isHome: false,
+          };
+        }
+        return t;
+      }));
+
+      setHistoryStack(prev => [...prev.slice(0, historyIndex + 1), cleanUrl]);
       setHistoryIndex(prev => prev + 1);
     } finally {
       setIsLoadingPage(false);
@@ -341,6 +363,7 @@ export const EmbeddedChromeBrowser: React.FC<EmbeddedChromeBrowserProps> = ({
       const prevUrl = historyStack[historyIndex - 1];
       setHistoryIndex(historyIndex - 1);
       setUrlInput(prevUrl);
+      handleNavigateUrl(prevUrl);
     }
   };
 
@@ -349,250 +372,474 @@ export const EmbeddedChromeBrowser: React.FC<EmbeddedChromeBrowserProps> = ({
       const nextUrl = historyStack[historyIndex + 1];
       setHistoryIndex(historyIndex + 1);
       setUrlInput(nextUrl);
+      handleNavigateUrl(nextUrl);
     }
   };
 
-  const handleSaveToVideoDownloadClick = () => {
-    onTriggerSnifferModal(activeTab.streams, activeTab.title, activeTab.url);
+  // Direct 1-click Download (Kendi Tarayıcısından Hemen İndir)
+  const handleDirectDownloadClick = (streamToDownload?: DetectedStream) => {
+    const stream = streamToDownload || bestStream;
+    if (!stream) {
+      onTriggerSnifferModal(activeTab.streams, activeTab.title, activeTab.url, activeTab.poster);
+      return;
+    }
+    setShowQualityDropdown(false);
+    onDirectDownload(stream, activeTab.title, activeTab.url, activeTab.poster);
   };
 
+  // Most recent or active download for the in-browser dock
+  const currentDownloadingItem = activeDownloads.find(d => d.status === 'downloading') || activeDownloads[0];
+
   return (
-    <div className="flex-1 overflow-auto bg-neutral-100 dark:bg-neutral-950 p-6 flex flex-col gap-4 text-xs font-sans">
-      {/* Intro info box */}
-      <div className="bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-900/60 rounded-xl p-4 flex items-center justify-between gap-4">
+    <div className="flex-1 overflow-auto bg-neutral-100 dark:bg-neutral-950 p-4 md:p-6 flex flex-col gap-3 text-xs font-sans">
+      {/* Top Banner / Feature Callout */}
+      <div className="bg-gradient-to-r from-sky-600 via-indigo-600 to-sky-700 text-white rounded-xl p-4 shadow-md flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-sky-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
-            Chrome
+          <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shrink-0">
+            <Globe className="w-5 h-5 text-sky-200" />
           </div>
           <div>
-            <h3 className="font-semibold text-neutral-900 dark:text-neutral-100 text-xs">
-              Google Chrome İçine Gömülü SaveToVideo Video Yakalayıcı Simülasyonu
-            </h3>
-            <p className="text-[11px] text-neutral-600 dark:text-neutral-400 mt-0.5">
-              Chrome'da açılan her video oynatıcısının üzerinde SaveToVideo'nun meşhur <strong>"Bu Videoyu İndir"</strong> paneli otomatik olarak belirir. Adres çubuğuna dilediğiniz video sitesini yazıp Enter'a basabilirsiniz.
+            <div className="flex items-center gap-2">
+              <h3 className="font-bold text-sm tracking-tight">
+                SaveToVideo Dahili Web Tarayıcısı
+              </h3>
+              <span className="px-2 py-0.5 rounded-full bg-emerald-500/90 text-white text-[10px] font-semibold tracking-wide flex items-center gap-1">
+                <Zap className="w-3 h-3" />
+                Dahili Doğrudan İndirme Aktif
+              </span>
+            </div>
+            <p className="text-xs text-sky-100/90 mt-0.5">
+              İstediğiniz video adresine gidin; SaveToVideo videoyu otomatik yakalar ve <strong>"Bu Tarayıcıdan Hemen İndir"</strong> ile tek tıkla doğrudan indirir.
             </p>
           </div>
         </div>
 
-        <button
-          onClick={handleSaveToVideoDownloadClick}
-          className="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-lg shrink-0 shadow-2xs flex items-center gap-1.5 transition-colors"
-        >
-          <Download className="w-3.5 h-3.5" />
-          <span>Bu Videoyu İndir ({activeTab.streams.length} Akış)</span>
-        </button>
+        <div className="flex items-center gap-2">
+          {bestStream && (
+            <button
+              onClick={() => handleDirectDownloadClick(bestStream)}
+              className="px-4 py-2 bg-amber-400 hover:bg-amber-300 text-neutral-950 font-bold rounded-lg shadow-md flex items-center gap-1.5 transition-all transform hover:scale-102 active:scale-98"
+            >
+              <Zap className="w-4 h-4 fill-neutral-950" />
+              <span>Bu Tarayıcıdan Hemen İndir ({bestStream.quality})</span>
+            </button>
+          )}
+
+          <button
+            onClick={() => onTriggerSnifferModal(activeTab.streams, activeTab.title, activeTab.url, activeTab.poster)}
+            className="px-3.5 py-2 bg-white/15 hover:bg-white/25 border border-white/30 text-white font-semibold rounded-lg flex items-center gap-1.5 transition-colors"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Kalite Seçenekleri ({activeTab.streams.length})</span>
+          </button>
+        </div>
       </div>
 
-      {/* Chrome Window Frame */}
-      <div className="w-full bg-white dark:bg-neutral-900 rounded-xl border border-neutral-300 dark:border-neutral-700 shadow-xl overflow-hidden flex flex-col">
-        {/* Chrome Title Bar & Tabs */}
-        <div className="bg-neutral-200 dark:bg-neutral-800 px-3 pt-2.5 flex items-center gap-2 select-none">
-          {/* Mac / Window control dots */}
-          <div className="flex items-center gap-1.5 px-2">
-            <div className="w-3 h-3 rounded-full bg-rose-500/80" />
-            <div className="w-3 h-3 rounded-full bg-amber-500/80" />
-            <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
+      {/* Main Internal Browser Window Frame */}
+      <div className="w-full bg-white dark:bg-neutral-900 rounded-xl border border-neutral-300 dark:border-neutral-800 shadow-2xl overflow-hidden flex flex-col min-h-[620px]">
+        {/* Browser Tab Bar */}
+        <div className="bg-neutral-200 dark:bg-neutral-800/90 px-3 pt-2.5 flex items-center gap-2 select-none border-b border-neutral-300/80 dark:border-neutral-700/80">
+          {/* OS-Style Window Buttons */}
+          <div className="flex items-center gap-1.5 px-1 mr-1">
+            <div className="w-3 h-3 rounded-full bg-rose-500/90 hover:opacity-80 transition-opacity" />
+            <div className="w-3 h-3 rounded-full bg-amber-500/90 hover:opacity-80 transition-opacity" />
+            <div className="w-3 h-3 rounded-full bg-emerald-500/90 hover:opacity-80 transition-opacity" />
           </div>
 
-          {/* Chrome Tabs */}
-          <div className="flex items-center gap-1 overflow-x-auto flex-1">
+          {/* Tab Strip */}
+          <div className="flex items-center gap-1 overflow-x-auto flex-1 scrollbar-none">
             {tabs.map((t) => (
-              <button
+              <div
                 key={t.id}
                 onClick={() => handleTabSwitch(t)}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-t-lg text-[11px] font-medium transition-all max-w-[200px] truncate ${
+                className={`group flex items-center gap-2 px-3 py-1.5 rounded-t-lg text-xs font-medium cursor-pointer transition-all max-w-[220px] select-none ${
                   activeTabId === t.id
-                    ? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 shadow-2xs'
-                    : 'bg-neutral-300/60 dark:bg-neutral-800/60 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-300 dark:hover:bg-neutral-700'
+                    ? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 shadow-2xs border-t-2 border-t-sky-500'
+                    : 'bg-neutral-300/50 dark:bg-neutral-800/50 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-300/80 dark:hover:bg-neutral-700/70'
                 }`}
               >
-                <div className="w-2 h-2 rounded-full bg-sky-500" />
-                <span className="truncate">{t.title}</span>
-              </button>
+                <div className="w-2 h-2 rounded-full bg-sky-500 shrink-0" />
+                <span className="truncate flex-1">{t.title}</span>
+                <button
+                  onClick={(e) => handleCloseTab(e, t.id)}
+                  title="Sekmeyi Kapat"
+                  className="opacity-0 group-hover:opacity-100 hover:bg-neutral-400/40 dark:hover:bg-neutral-600 rounded p-0.5 transition-all text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </div>
             ))}
 
             <button
-              onClick={() => handleNavigateUrl('https://example-media.com/videos/custom-test')}
-              title="Yeni Video Sekmesi Aç"
-              className="p-1.5 text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-200 rounded-full hover:bg-neutral-300/60 dark:hover:bg-neutral-700 transition-colors"
+              onClick={() => handleOpenNewTab()}
+              title="Yeni Sekme Aç"
+              className="p-1.5 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 rounded-md hover:bg-neutral-300/70 dark:hover:bg-neutral-700 transition-colors shrink-0 ml-1"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        {/* Chrome Navigation & Address Bar */}
-        <div className="bg-white dark:bg-neutral-900 px-3 py-2 border-b border-neutral-200 dark:border-neutral-800 flex items-center gap-3">
-          <div className="flex items-center gap-1 text-neutral-500">
+        {/* Browser Omnibox Toolbar */}
+        <div className="bg-white dark:bg-neutral-900 px-3 py-2 border-b border-neutral-200 dark:border-neutral-800 flex items-center gap-2 relative">
+          <div className="flex items-center gap-1 text-neutral-600 dark:text-neutral-400">
             <button 
               onClick={handleBack}
               disabled={historyIndex <= 0}
               title="Geri"
-              className={`p-1 rounded ${historyIndex > 0 ? 'hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300' : 'text-neutral-300 dark:text-neutral-700 cursor-not-allowed'}`}
+              className={`p-1.5 rounded hover:bg-neutral-100 dark:hover:bg-neutral-800 ${historyIndex > 0 ? 'text-neutral-700 dark:text-neutral-200' : 'text-neutral-300 dark:text-neutral-700 cursor-not-allowed'}`}
             >
-              <ArrowLeft className="w-3.5 h-3.5" />
+              <ArrowLeft className="w-4 h-4" />
             </button>
             <button 
               onClick={handleForward}
               disabled={historyIndex >= historyStack.length - 1}
               title="İleri"
-              className={`p-1 rounded ${historyIndex < historyStack.length - 1 ? 'hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300' : 'text-neutral-300 dark:text-neutral-700 cursor-not-allowed'}`}
+              className={`p-1.5 rounded hover:bg-neutral-100 dark:hover:bg-neutral-800 ${historyIndex < historyStack.length - 1 ? 'text-neutral-700 dark:text-neutral-200' : 'text-neutral-300 dark:text-neutral-700 cursor-not-allowed'}`}
             >
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-4 h-4" />
+            </button>
+            <button 
+              onClick={() => handleNavigateUrl(urlInput)}
+              title="Sayfayı Yenile"
+              className="p-1.5 rounded hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-200"
+            >
+              <RotateCw className={`w-4 h-4 ${isLoadingPage ? 'animate-spin text-sky-500' : ''}`} />
             </button>
             <button 
               onClick={() => {
-                if (videoRef.current) {
-                  videoRef.current.load();
-                  setIsPlaying(false);
-                }
+                setUrlInput('');
+                setTabs(prev => prev.map(t => t.id === activeTabId ? { ...t, isHome: true, url: 'stv://home', title: 'Yeni Sekme' } : t));
               }}
-              title="Sayfayı Yenile"
-              className="p-1 rounded hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300"
+              title="Giriş Sayfası"
+              className="p-1.5 rounded hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-200"
             >
-              <RotateCw className="w-3.5 h-3.5" />
+              <Home className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Omnibox / Address URL input */}
-          <div className="flex-1 flex items-center gap-2 bg-neutral-100 dark:bg-neutral-800 px-3 py-1.5 rounded-full border border-neutral-200 dark:border-neutral-700 text-xs font-mono">
-            <Lock className="w-3 h-3 text-emerald-600 dark:text-emerald-400 shrink-0" />
+          {/* Omnibox Input */}
+          <div className="flex-1 flex items-center gap-2 bg-neutral-100 dark:bg-neutral-800 px-3.5 py-1.5 rounded-lg border border-neutral-200 dark:border-neutral-700 text-xs font-mono focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all">
+            <Lock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
             <input
               type="text"
               value={urlInput}
               onChange={(e) => setUrlInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleNavigateUrl(urlInput)}
-              placeholder="Web adresi girin ve Enter'a basın..."
-              className="w-full bg-transparent text-neutral-900 dark:text-neutral-100 focus:outline-none"
+              placeholder="Web adresi yazın (örn: https://www.hdfilmcehennemi.nl/the-dog-stars-2/ veya youtube adresi)..."
+              className="w-full bg-transparent text-neutral-900 dark:text-neutral-100 focus:outline-none placeholder:text-neutral-400 font-sans text-xs"
             />
-            {isLoadingPage && (
-              <span className="text-[10px] text-sky-600 animate-pulse font-sans">
-                Yükleniyor...
-              </span>
+            {urlInput && (
+              <button
+                onClick={() => setUrlInput('')}
+                className="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
             )}
-          </div>
-
-          {/* Chrome Extensions Area */}
-          <div className="flex items-center gap-2 shrink-0">
-            {/* SaveToVideo Extension Icon with Live Detection Badge */}
             <button
-              onClick={handleSaveToVideoDownloadClick}
-              title={`SaveToVideo: Bu sekmede ${activeTab.streams.length} adet video akışı yakalandı`}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-sky-50 dark:bg-sky-950/60 border border-sky-300 dark:border-sky-800 text-sky-700 dark:text-sky-300 font-semibold hover:bg-sky-100 transition-colors shadow-2xs"
+              onClick={() => handleNavigateUrl(urlInput)}
+              className="p-1 rounded bg-sky-600 hover:bg-sky-700 text-white shrink-0 ml-1"
+              title="Git / Ara"
             >
-              <Puzzle className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
-              <span>STV</span>
-              <span className="w-4 h-4 rounded-full bg-emerald-500 text-white font-mono text-[9px] flex items-center justify-center font-bold">
-                {activeTab.streams.length}
-              </span>
+              <Search className="w-3 h-3" />
             </button>
           </div>
-        </div>
 
-        {/* Chrome Webpage Content Area with HTML5 Video */}
-        <div className="bg-neutral-900 relative min-h-[420px] flex flex-col justify-center items-center">
-          {/* THE FAMOUS FLOATING VIDEO DOWNLOAD PANEL (Gömülü SaveToVideo Butonu) */}
-          <div 
-            onClick={handleSaveToVideoDownloadClick}
-            className="absolute top-4 right-4 z-30 cursor-pointer bg-neutral-900/90 hover:bg-sky-600 border border-white/20 hover:border-sky-400 backdrop-blur-md text-white px-3.5 py-1.5 rounded-lg shadow-xl flex items-center gap-2 transition-all transform hover:-translate-y-0.5 group select-none"
-          >
-            <div className="w-6 h-4 rounded bg-sky-500 group-hover:bg-white text-white group-hover:text-sky-600 flex items-center justify-center font-bold text-[8px]">
-              STV
+          {/* SaveToVideo Direct Action Controls */}
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Quick In-Browser Download Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setShowQualityDropdown(!showQualityDropdown)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white font-semibold transition-all shadow-xs"
+                title="Dahili Tarayıcıdan İndir"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Tarayıcıdan İndir</span>
+                <span className="w-5 h-5 rounded-full bg-white/20 text-white font-mono text-[10px] flex items-center justify-center font-bold">
+                  {activeTab.streams.length}
+                </span>
+                <ChevronDown className="w-3.5 h-3.5 opacity-70" />
+              </button>
+
+              {/* Quality Dropdown Menu */}
+              {showQualityDropdown && (
+                <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-neutral-800 rounded-xl shadow-2xl border border-neutral-200 dark:border-neutral-700 p-2 z-50">
+                  <div className="px-3 py-2 border-b border-neutral-100 dark:border-neutral-700 flex items-center justify-between">
+                    <span className="font-bold text-neutral-900 dark:text-neutral-100 text-xs">
+                      Dahili İndirme Akışları
+                    </span>
+                    <span className="text-[10px] text-emerald-500 font-medium">● Hazır</span>
+                  </div>
+
+                  <div className="py-1 max-h-64 overflow-y-auto space-y-1">
+                    {activeTab.streams.length === 0 ? (
+                      <div className="p-3 text-center text-neutral-500">
+                        Bu sayfada henüz video tespit edilmedi.
+                      </div>
+                    ) : (
+                      activeTab.streams.map((stream) => (
+                        <div
+                          key={stream.id}
+                          className="flex items-center justify-between p-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700/60 transition-colors group"
+                        >
+                          <div className="flex flex-col min-w-0 pr-2">
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-bold text-neutral-800 dark:text-neutral-200 text-xs">
+                                {stream.quality}
+                              </span>
+                              <span className="text-[10px] font-mono px-1 rounded bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300">
+                                {stream.format}
+                              </span>
+                            </div>
+                            <span className="text-[10px] text-neutral-500 dark:text-neutral-400 truncate">
+                              {stream.sizeFormatted} · {stream.bitrate || 'Standart Bitrate'}
+                            </span>
+                          </div>
+
+                          <button
+                            onClick={() => handleDirectDownloadClick(stream)}
+                            className="px-2.5 py-1.5 rounded-md bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold flex items-center gap-1 shrink-0 shadow-2xs group-hover:bg-emerald-600 transition-colors"
+                          >
+                            <Zap className="w-3 h-3 fill-white" />
+                            <span>İndir</span>
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  <div className="pt-2 border-t border-neutral-100 dark:border-neutral-700 flex items-center justify-between text-[11px] px-2 text-neutral-500">
+                    <span>8x Paralel Bağlantı Hızı</span>
+                    <button
+                      onClick={() => {
+                        setShowQualityDropdown(false);
+                        onTriggerSnifferModal(activeTab.streams, activeTab.title, activeTab.url, activeTab.poster);
+                      }}
+                      className="text-sky-600 dark:text-sky-400 hover:underline font-medium"
+                    >
+                      Gelişmiş Ayarlar
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
-            <span className="font-semibold text-xs tracking-wide">
-              Bu Videoyu İndir
-            </span>
-            <span className="bg-emerald-500 text-white font-mono text-[10px] font-bold px-1.5 py-0.2 rounded-full">
-              {activeTab.streams.length} Kalite
-            </span>
           </div>
 
-          {/* HDFilmCehennemi Server Selector Bar */}
-          {activeTab.url.toLowerCase().includes('hdfilmcehennemi') && (
-            <div className="w-full bg-neutral-950 px-4 py-2 border-b border-neutral-800 flex flex-wrap items-center justify-between gap-2 z-10 text-xs">
-              <div className="flex items-center gap-1.5">
-                <span className="text-neutral-400 text-[11px]">Sunucu:</span>
-                <span className="px-2 py-0.5 rounded bg-sky-600 text-white font-medium text-[11px]">Cehennem Player (1080p FHD)</span>
-                <span className="px-2 py-0.5 rounded bg-neutral-800 text-neutral-300 hover:bg-neutral-700 cursor-pointer text-[11px]">VidMoly</span>
-                <span className="px-2 py-0.5 rounded bg-neutral-800 text-neutral-300 hover:bg-neutral-700 cursor-pointer text-[11px]">Rapidrame HLS</span>
+          {/* Loading progress bar indicator */}
+          {isLoadingPage && (
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-neutral-200 dark:bg-neutral-700 overflow-hidden">
+              <div className="h-full bg-sky-500 animate-[pulse_1s_infinite] w-full" />
+            </div>
+          )}
+        </div>
+
+        {/* Bookmarks Bar */}
+        <div className="bg-neutral-50 dark:bg-neutral-900/60 px-3 py-1.5 border-b border-neutral-200 dark:border-neutral-800 flex items-center gap-2 overflow-x-auto select-none">
+          <span className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider shrink-0 flex items-center gap-1">
+            <span>Yer İmleri:</span>
+          </span>
+          {DEFAULT_BOOKMARKS.map((bm, idx) => (
+            <button
+              key={idx}
+              onClick={() => handleNavigateUrl(bm.url)}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] bg-white dark:bg-neutral-800 hover:bg-sky-50 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 hover:text-sky-600 dark:hover:text-sky-400 border border-neutral-200 dark:border-neutral-700 transition-colors shrink-0"
+            >
+              <span>{bm.icon}</span>
+              <span className="font-medium">{bm.name}</span>
+              <span className="text-[9px] font-mono px-1 rounded bg-neutral-100 dark:bg-neutral-900 text-neutral-500">
+                {bm.badge}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        {/* Web Content & Video Presentation Area */}
+        <div className="flex-1 bg-neutral-950 relative flex flex-col justify-center items-center overflow-hidden">
+          {activeTab.isHome ? (
+            /* Browser Start / Speed Dial Page */
+            <div className="w-full max-w-3xl p-8 flex flex-col items-center justify-center text-center">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-sky-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-lg mb-4">
+                STV
               </div>
-              <div className="flex items-center gap-1.5">
-                <span className="px-2 py-0.5 rounded bg-emerald-600/80 text-white text-[11px] font-medium">🇹🇷 Türkçe Dublaj</span>
-                <span className="px-2 py-0.5 rounded bg-neutral-800 text-neutral-300 text-[11px]">💬 Altyazılı</span>
+              <h2 className="text-xl font-bold text-white mb-2">
+                SaveToVideo Dahili Web Tarayıcısı
+              </h2>
+              <p className="text-neutral-400 text-xs max-w-md mb-6">
+                Aşağıdaki popüler video sitelerinden birini seçin ya da adres çubuğuna dilediğiniz video bağlantısını yapıştırın.
+              </p>
+
+              {/* Speed Dial Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 w-full">
+                {DEFAULT_BOOKMARKS.map((bm, i) => (
+                  <div
+                    key={i}
+                    onClick={() => handleNavigateUrl(bm.url)}
+                    className="p-4 rounded-xl bg-neutral-900 border border-neutral-800 hover:border-sky-500 cursor-pointer text-left transition-all hover:-translate-y-0.5 group"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-2xl">{bm.icon}</span>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/20 text-sky-400 font-semibold">
+                        {bm.badge}
+                      </span>
+                    </div>
+                    <div className="font-bold text-white text-xs group-hover:text-sky-400 transition-colors">
+                      {bm.name}
+                    </div>
+                    <div className="text-[10px] text-neutral-500 truncate mt-1">
+                      {bm.url}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            /* Active Web Page with Video Player */
+            <div className="w-full h-full flex flex-col relative">
+              {/* Floating STV Video Download Overlay Button */}
+              <div className="absolute top-4 right-4 z-30 flex items-center gap-2">
+                {/* 1-Click Fast Download Direct from Browser */}
+                <button
+                  onClick={() => handleDirectDownloadClick(bestStream || undefined)}
+                  className="bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold px-3.5 py-2 rounded-xl shadow-2xl flex items-center gap-2 transition-all transform hover:scale-105 active:scale-95 border border-amber-300"
+                  title="Bu tarayıcı üzerinden 1 tıkla anında indir"
+                >
+                  <Zap className="w-4 h-4 fill-neutral-950" />
+                  <span className="text-xs">Bu Tarayıcıdan Hemen İndir</span>
+                  {bestStream && (
+                    <span className="bg-neutral-900 text-amber-300 text-[10px] font-mono px-1.5 py-0.5 rounded font-bold">
+                      {bestStream.quality}
+                    </span>
+                  )}
+                </button>
+
+                {/* Stream Picker Modal Button */}
+                <button
+                  onClick={() => onTriggerSnifferModal(activeTab.streams, activeTab.title, activeTab.url, activeTab.poster)}
+                  className="bg-neutral-900/90 hover:bg-sky-600 border border-white/20 hover:border-sky-400 backdrop-blur-md text-white px-3 py-2 rounded-xl shadow-xl flex items-center gap-2 transition-all group"
+                  title="Tüm Kalite Seçeneklerini Göster"
+                >
+                  <div className="w-5 h-4 rounded bg-sky-500 group-hover:bg-white text-white group-hover:text-sky-600 flex items-center justify-center font-bold text-[8px]">
+                    STV
+                  </div>
+                  <span className="font-medium text-xs">Kalite Seç</span>
+                  <span className="bg-emerald-500 text-white font-mono text-[10px] font-bold px-1.5 py-0.2 rounded-full">
+                    {activeTab.streams.length}
+                  </span>
+                </button>
+              </div>
+
+              {/* HDFilmCehennemi Server Selector Bar */}
+              {activeTab.url.toLowerCase().includes('hdfilmcehennemi') && (
+                <div className="w-full bg-neutral-950 px-4 py-2 border-b border-neutral-800 flex flex-wrap items-center justify-between gap-2 z-10 text-xs">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-neutral-400 text-[11px]">Sunucu:</span>
+                    <span className="px-2.5 py-1 rounded bg-sky-600 text-white font-medium text-[11px] flex items-center gap-1">
+                      <Film className="w-3 h-3" />
+                      Cehennem Player (1080p FHD)
+                    </span>
+                    <span className="px-2.5 py-1 rounded bg-neutral-800 text-neutral-300 hover:bg-neutral-700 cursor-pointer text-[11px]">
+                      VidMoly
+                    </span>
+                    <span className="px-2.5 py-1 rounded bg-neutral-800 text-neutral-300 hover:bg-neutral-700 cursor-pointer text-[11px]">
+                      Rapidrame HLS
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="px-2 py-0.5 rounded bg-emerald-600/80 text-white text-[11px] font-medium">
+                      🇹🇷 Türkçe Dublaj
+                    </span>
+                    <span className="px-2 py-0.5 rounded bg-neutral-800 text-neutral-300 text-[11px]">
+                      💬 Altyazılı
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Genuine YouTube Player or HTML5 Video Player */}
+              <div className="flex-1 flex items-center justify-center bg-black min-h-[440px]">
+                {(() => {
+                  const ytMatch = activeTab.url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i);
+                  const currentYtId = ytMatch ? ytMatch[1] : null;
+
+                  if (currentYtId) {
+                    return (
+                      <iframe
+                        src={`https://www.youtube-nocookie.com/embed/${currentYtId}?autoplay=1&enablejsapi=1`}
+                        title={activeTab.title}
+                        className="w-full h-[460px] border-0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowFullScreen
+                      />
+                    );
+                  }
+
+                  return (
+                    <video
+                      ref={videoRef}
+                      src={activeTab.videoSrc}
+                      poster={activeTab.poster}
+                      controls
+                      playsInline
+                      onPlay={() => setIsPlaying(true)}
+                      onPause={() => setIsPlaying(false)}
+                      className="w-full max-h-[460px] object-contain shadow-inner"
+                    />
+                  );
+                })()}
               </div>
             </div>
           )}
-
-          {/* Genuine YouTube Player or HTML5 Video Player */}
-          {(() => {
-            const ytMatch = activeTab.url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i);
-            const currentYtId = ytMatch ? ytMatch[1] : null;
-
-            if (currentYtId) {
-              return (
-                <iframe
-                  src={`https://www.youtube-nocookie.com/embed/${currentYtId}?autoplay=1&enablejsapi=1`}
-                  title={activeTab.title}
-                  className="w-full h-[460px] border-0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                />
-              );
-            }
-
-            return (
-              <video
-                ref={videoRef}
-                src={activeTab.videoSrc}
-                poster={activeTab.poster}
-                controls
-                playsInline
-                onPlay={() => setIsPlaying(true)}
-                onPause={() => setIsPlaying(false)}
-                className="w-full max-h-[460px] object-contain shadow-inner"
-              />
-            );
-          })()}
         </div>
 
-        {/* Video Metadata & Description Bar */}
-        <div className="p-4 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <h4 className="font-bold text-neutral-900 dark:text-neutral-100 text-sm">
-              {activeTab.title}
-            </h4>
-            <p className="text-neutral-500 dark:text-neutral-400 text-xs mt-0.5">
-              {activeTab.desc}
-            </p>
+        {/* Video Info and Browser Actions Footer */}
+        {!activeTab.isHome && (
+          <div className="p-4 bg-white dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <h4 className="font-bold text-neutral-900 dark:text-neutral-100 text-sm truncate">
+                  {activeTab.title}
+                </h4>
+                <span className="px-2 py-0.5 rounded bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 font-mono text-[10px] shrink-0">
+                  {activeTab.streams.length} Akış Yakalandı
+                </span>
+              </div>
+              <p className="text-neutral-500 dark:text-neutral-400 text-xs mt-0.5 truncate max-w-2xl">
+                {activeTab.desc}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => setShowNetworkSniffer(!showNetworkSniffer)}
+                className="px-3 py-1.5 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 font-medium flex items-center gap-1.5 transition-colors text-xs"
+              >
+                <Terminal className="w-3.5 h-3.5 text-neutral-500" />
+                <span>Ağ Dinleyici ({showNetworkSniffer ? 'Gizle' : 'Göster'})</span>
+              </button>
+
+              {bestStream && (
+                <button
+                  onClick={() => handleDirectDownloadClick(bestStream)}
+                  className="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-lg shadow-sm flex items-center gap-1.5 transition-all text-xs"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Bu Videoyu İndir</span>
+                </button>
+              )}
+            </div>
           </div>
+        )}
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowNetworkSniffer(!showNetworkSniffer)}
-              className="px-3 py-1.5 rounded-md border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 font-medium flex items-center gap-1.5 transition-colors"
-            >
-              <Terminal className="w-3.5 h-3.5 text-neutral-500" />
-              <span>Ağ Medya Yakalayıcısı ({showNetworkSniffer ? 'Gizle' : 'Göster'})</span>
-            </button>
-
-            <button
-              onClick={handleSaveToVideoDownloadClick}
-              className="px-3.5 py-1.5 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-md shadow-2xs flex items-center gap-1.5 transition-colors"
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>Kalite Seç &amp; İndir</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Live Network Media Sniffer DevTools Panel */}
-        {showNetworkSniffer && (
+        {/* Live Network Sniffer Console */}
+        {showNetworkSniffer && !activeTab.isHome && (
           <div className="bg-neutral-950 text-neutral-300 p-4 font-mono text-[11px] border-t border-neutral-800 space-y-2">
             <div className="flex items-center justify-between text-neutral-400 border-b border-neutral-800 pb-2">
               <div className="flex items-center gap-2">
                 <Activity className="w-3.5 h-3.5 text-emerald-400" />
                 <span className="font-semibold text-neutral-200">
-                  Chrome Ağ Akışı Dinleyicisi (SaveToVideo Deep Network Sniffer)
+                  SaveToVideo Dahili Ağ Dinleyicisi (Live Stream Interceptor)
                 </span>
               </div>
               <span className="text-[10px] text-emerald-400">
@@ -612,14 +859,109 @@ export const EmbeddedChromeBrowser: React.FC<EmbeddedChromeBrowserProps> = ({
                     <span className="text-neutral-400">{s.sizeFormatted}</span>
                     <span className="text-neutral-500">{s.mimeType}</span>
                     <button
-                      onClick={handleSaveToVideoDownloadClick}
+                      onClick={() => handleDirectDownloadClick(s)}
                       className="px-2 py-0.5 bg-sky-700 hover:bg-sky-600 text-white rounded text-[10px] font-sans font-semibold"
                     >
-                      Yakala
+                      Hemen İndir
                     </button>
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* IN-BROWSER LIVE DOWNLOAD DOCK (Dahili Tarayıcı İndirme Paneli) */}
+        {currentDownloadingItem && (
+          <div className="bg-sky-900/30 dark:bg-neutral-950/90 border-t-2 border-sky-500 px-4 py-3 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs select-none">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="relative w-12 h-10 rounded-lg overflow-hidden bg-neutral-800 shrink-0 border border-neutral-700">
+                <img
+                  src={currentDownloadingItem.thumbnail || activeTab.poster}
+                  alt=""
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-sky-900/40 flex items-center justify-center">
+                  <Download className="w-4 h-4 text-white animate-bounce" />
+                </div>
+              </div>
+
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-neutral-900 dark:text-neutral-100 truncate max-w-xs sm:max-w-md">
+                    {currentDownloadingItem.fileName}
+                  </span>
+                  <span className="px-1.5 py-0.5 rounded bg-sky-600 text-white font-mono text-[10px] font-bold shrink-0">
+                    %{currentDownloadingItem.progress}
+                  </span>
+                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono font-semibold shrink-0">
+                    {currentDownloadingItem.speedFormatted}
+                  </span>
+                </div>
+
+                {/* Progress bar and eta */}
+                <div className="flex items-center gap-3 mt-1">
+                  <div className="w-44 sm:w-64 h-2 rounded-full bg-neutral-200 dark:bg-neutral-700 overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-sky-500 to-indigo-500 transition-all duration-300"
+                      style={{ width: `${currentDownloadingItem.progress}%` }}
+                    />
+                  </div>
+                  <span className="text-[10px] text-neutral-500 dark:text-neutral-400">
+                    Kalan: {currentDownloadingItem.timeLeft} · {currentDownloadingItem.connections}x Kanal
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* In-Browser Dock Quick Action Buttons */}
+            <div className="flex items-center gap-2 shrink-0 self-end md:self-center">
+              {onWatchNow && (
+                <button
+                  onClick={() => onWatchNow(currentDownloadingItem)}
+                  className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg flex items-center gap-1.5 shadow-xs transition-colors"
+                  title="İndirilirken eşzamanlı izle"
+                >
+                  <Play className="w-3.5 h-3.5 fill-white" />
+                  <span>Şimdi İzle</span>
+                </button>
+              )}
+
+              {onShowInFolder && (
+                <button
+                  onClick={() => onShowInFolder(currentDownloadingItem)}
+                  className="px-3 py-1.5 bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 font-medium rounded-lg flex items-center gap-1.5 transition-colors"
+                  title="Klasörde Göster"
+                >
+                  <Folder className="w-3.5 h-3.5 text-amber-500" />
+                  <span>Klasörde Göster</span>
+                </button>
+              )}
+
+              {onTogglePause && (
+                <button
+                  onClick={() => onTogglePause(currentDownloadingItem.id)}
+                  className="p-1.5 rounded-lg border border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                  title={currentDownloadingItem.status === 'downloading' ? 'Duraklat' : 'Devam Et'}
+                >
+                  {currentDownloadingItem.status === 'downloading' ? (
+                    <Pause className="w-3.5 h-3.5" />
+                  ) : (
+                    <Play className="w-3.5 h-3.5" />
+                  )}
+                </button>
+              )}
+
+              {onNavigateToDownloads && (
+                <button
+                  onClick={onNavigateToDownloads}
+                  className="px-3 py-1.5 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-lg flex items-center gap-1 transition-colors"
+                  title="İndirmeler Listesine Git"
+                >
+                  <List className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">İndirmeler</span>
+                </button>
+              )}
             </div>
           </div>
         )}
